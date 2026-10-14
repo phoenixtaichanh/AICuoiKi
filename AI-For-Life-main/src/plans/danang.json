@@ -1,0 +1,426 @@
+{
+  "city": "danang",
+  "plans": [
+    {
+      "id": "DN01",
+      "plan_type": "core",
+      "name": "Đà Nẵng First Trip – Khám phá những điểm nổi bật",
+      "description": "Lịch trình cân bằng cho người lần đầu tới Đà Nẵng: biển, núi, cầu, ẩm thực, đèn lồng phố cổ Hội An gần đó.",
+      "default_days": 3,
+      "default_nights": 2,
+      "budget_min": 4500000,
+      "budget_max": 6000000,
+      "travel_style": "balanced",
+      "intensity": "balanced",
+      "suitable_for": ["first-time", "couple", "family", "friends"],
+      "intent_keywords": [
+        "lần đầu", "first time", "nổi bật", "khám phá", "tham quan",
+        "đi đà nẵng", "đà nẵng 3 ngày", "đà nẵng cơ bản"
+      ],
+      "preference_keywords": [
+        "biển", "food", "ẩm thực", "điểm nổi tiếng", "iconic"
+      ],
+      "preferred_categories": [
+        "sightseeing", "cultural", "beach", "food"
+      ],
+      "preferred_tags": [
+        "iconic", "beach", "heritage", "unesco", "photo", "famous", "must-see"
+      ],
+      "excluded_tags": [
+        "nightlife", "party"
+      ],
+      "preferred_price_levels": ["$", "$$"],
+      "budget_weight": 0.6,
+      "rating_weight": 1.2,
+      "popularity_weight": 1.2,
+      "distance_weight": 0.8,
+      "preference_weight": 1.0,
+      "rules": {
+        "min_rating": 4.3,
+        "min_review_count": 1000,
+        "max_places_per_day": 4,
+        "max_travel_minutes_per_day": 240,
+        "min_relax_time_per_day": 60,
+        "max_hotel_avg_cost": 1200000
+      },
+      "itinerary_rules": [
+        "Mỗi ngày tối đa 4 địa điểm (đã tính hotel)",
+        "Cân bằng attraction/food/cafe",
+        "Ưu tiên iconic + UNESCO",
+        "Không nhồi quá 2 sightseeing/ngày"
+      ],
+      "tags": [
+        "first-trip", "sightseeing", "food", "beach", "popular"
+      ]
+    },
+    {
+      "id": "DN02",
+      "plan_type": "core",
+      "name": "Đà Nẵng Beach Escape – Nghỉ dưỡng và biển",
+      "description": "Lịch trình chậm, tập trung biển Mỹ Khê, Sơn Trà, cafe view biển, spa, hải sản, sunset.",
+      "default_days": 3,
+      "default_nights": 2,
+      "budget_min": 5000000,
+      "budget_max": 7000000,
+      "travel_style": "relax",
+      "intensity": "slow",
+      "suitable_for": ["couple", "solo", "family"],
+      "intent_keywords": [
+        "nghỉ dưỡng", "biển", "beach", "thư giãn", "resort",
+        "chill", "đà nẵng biển", "đà nẵng relax"
+      ],
+      "preference_keywords": [
+        "biển", "spa", "cafe", "view biển", "sunset", "hải sản", "seafood"
+      ],
+      "preferred_categories": [
+        "beach", "food", "hotel"
+      ],
+      "preferred_tags": [
+        "beach", "sea view", "sunset", "spa", "resort", "swim", "luxury"
+      ],
+      "excluded_tags": [
+        "nightlife", "party", "crowded", "market"
+      ],
+      "preferred_price_levels": ["$$", "$$$"],
+      "budget_weight": 0.8,
+      "rating_weight": 1.1,
+      "popularity_weight": 0.7,
+      "distance_weight": 0.6,
+      "preference_weight": 1.3,
+      "rules": {
+        "min_rating": 4.3,
+        "min_review_count": 500,
+        "max_places_per_day": 3,
+        "max_travel_minutes_per_day": 180,
+        "min_relax_time_per_day": 180,
+        "max_hotel_avg_cost": 1500000
+      },
+      "itinerary_rules": [
+        "Tối đa 3 địa điểm/ngày (đã tính hotel)",
+        "Phải có ít nhất 1 cafe view biển",
+        "Có thời gian nghỉ giữa trưa",
+        "Sunset spot ưu tiên 17:00-19:00"
+      ],
+      "tags": [
+        "beach", "relax", "resort", "slow-travel", "couple"
+      ]
+    },
+    {
+      "id": "DN03",
+      "plan_type": "core",
+      "name": "Đà Nẵng Adventure – Khám phá và trải nghiệm",
+      "description": "Lịch trình năng động: Sơn Trà, Bà Nà Hills, Ngũ Hành Sơn, trekking nhẹ, nhiều hoạt động ngoài trời.",
+      "default_days": 4,
+      "default_nights": 3,
+      "budget_min": 6000000,
+      "budget_max": 8000000,
+      "travel_style": "adventure",
+      "intensity": "active",
+      "suitable_for": ["friends", "solo", "young-couple"],
+      "intent_keywords": [
+        "phiêu lưu", "adventure", "khám phá", "trekking", "leo núi",
+        "năng động", "outdoor", "trải nghiệm", "đà nẵng mạo hiểm"
+      ],
+      "preference_keywords": [
+        "núi", "mountain", "trekking", "hiking", "outdoor", "nature", "theme park"
+      ],
+      "preferred_categories": [
+        "sightseeing", "entertainment", "cultural"
+      ],
+      "preferred_tags": [
+        "mountain", "hiking", "nature", "cable car", "theme park", "cave", "view", "explore"
+      ],
+      "excluded_tags": [
+        "spa", "luxury", "shopping"
+      ],
+      "preferred_price_levels": ["$", "$$", "$$$"],
+      "budget_weight": 0.5,
+      "rating_weight": 1.0,
+      "popularity_weight": 1.0,
+      "distance_weight": 1.0,
+      "preference_weight": 1.4,
+      "rules": {
+        "min_rating": 4.0,
+        "min_review_count": 500,
+        "max_places_per_day": 5,
+        "max_travel_minutes_per_day": 300,
+        "min_relax_time_per_day": 30,
+        "max_hotel_avg_cost": 1200000
+      },
+      "itinerary_rules": [
+        "Có thể tới 5 địa điểm/ngày",
+        "Mỗi ngày cố gắng 1 outdoor activity chính (Bà Nà, Sơn Trà, Ngũ Hành Sơn)",
+        "Ăn trưa nhanh, ăn tối no",
+        "Không quá 2 điểm free liên tiếp"
+      ],
+      "tags": [
+        "adventure", "outdoor", "active", "exploration"
+      ]
+    },
+    {
+      "id": "DN04",
+      "plan_type": "core",
+      "name": "Đà Nẵng Food Trip – Ăn gì ở Đà Nẵng",
+      "description": "Lịch trình tập trung ẩm thực: Mì Quảng, bún chả cá, bánh tráng cuốn thịt heo, hải sản, chợ đêm, cafe. Sightseeing chỉ phụ trợ.",
+      "default_days": 3,
+      "default_nights": 2,
+      "budget_min": 3500000,
+      "budget_max": 5000000,
+      "travel_style": "foodie",
+      "intensity": "balanced",
+      "suitable_for": ["foodie", "solo", "couple", "friends"],
+      "intent_keywords": [
+        "ẩm thực", "ăn uống", "food", "foodie", "mì quảng", "bún chả cá",
+        "hải sản", "đặc sản", "đà nẵng ăn gì", "chợ đêm"
+      ],
+      "preference_keywords": [
+        "food", "local", "seafood", "vietnamese", "cafe", "chợ", "street food"
+      ],
+      "preferred_categories": [
+        "food", "shopping"
+      ],
+      "preferred_tags": [
+        "food", "local", "seafood", "vietnamese", "dessert", "cafe", "famous", "bún", "mì"
+      ],
+      "excluded_tags": [
+        "luxury"
+      ],
+      "preferred_price_levels": ["$", "$$"],
+      "budget_weight": 1.0,
+      "rating_weight": 1.0,
+      "popularity_weight": 1.1,
+      "distance_weight": 0.7,
+      "preference_weight": 1.5,
+      "rules": {
+        "min_rating": 4.0,
+        "min_review_count": 200,
+        "max_places_per_day": 5,
+        "max_travel_minutes_per_day": 240,
+        "min_relax_time_per_day": 30,
+        "food_ratio_min": 0.6,
+        "max_hotel_avg_cost": 1000000
+      },
+      "itinerary_rules": [
+        "Tối thiểu 60% địa điểm là food/cafe/market",
+        "Mỗi ngày phải có ít nhất 2 bữa đặc sản (sáng + trưa hoặc tối)",
+        "Có thể ghé chợ đêm tối",
+        "Sightseeing tối đa 1/ngày"
+      ],
+      "tags": [
+        "food", "local-food", "cafe", "nightlife"
+      ]
+    },
+    {
+      "id": "DN05",
+      "plan_type": "core",
+      "name": "Đà Nẵng Family Trip – Du lịch cùng gia đình",
+      "description": "Lịch trình thoải mái cho cả gia đình: Mỹ Khê, Sơn Trà, Linh Ứng, Bà Nà Hills, Ngũ Hành Sơn, ăn uống dễ chịu.",
+      "default_days": 4,
+      "default_nights": 3,
+      "budget_min": 6000000,
+      "budget_max": 9000000,
+      "travel_style": "family",
+      "intensity": "balanced",
+      "suitable_for": ["family", "kids", "elderly"],
+      "intent_keywords": [
+        "gia đình", "family", "có con nhỏ", "trẻ em", "ba mẹ",
+        "đi với gia đình", "đà nẵng gia đình"
+      ],
+      "preference_keywords": [
+        "family", "kids", "comfortable", "easy", "an toàn", "safe"
+      ],
+      "preferred_categories": [
+        "sightseeing", "cultural", "beach", "food", "entertainment"
+      ],
+      "preferred_tags": [
+        "family", "kids", "easy", "comfortable", "iconic", "safe", "spacious", "theme park"
+      ],
+      "excluded_tags": [
+        "nightlife", "party", "trekking"
+      ],
+      "preferred_price_levels": ["$", "$$", "$$$"],
+      "budget_weight": 0.7,
+      "rating_weight": 1.1,
+      "popularity_weight": 1.2,
+      "distance_weight": 0.7,
+      "preference_weight": 1.2,
+      "rules": {
+        "min_rating": 4.2,
+        "min_review_count": 1000,
+        "max_places_per_day": 4,
+        "max_travel_minutes_per_day": 180,
+        "min_relax_time_per_day": 120,
+        "max_hotel_avg_cost": 1400000
+      },
+      "itinerary_rules": [
+        "Tối đa 4 địa điểm/ngày",
+        "Có thời gian nghỉ trưa dài",
+        "Tránh đi bộ quá nhiều",
+        "Có thể ghé theme park (Asia Park, Bà Nà)",
+        "Ăn uống đa dạng, dễ tính"
+      ],
+      "tags": [
+        "family", "comfortable", "easy", "sightseeing"
+      ]
+    },
+    {
+      "id": "DNA01",
+      "plan_type": "adaptive",
+      "name": "Quiet Da Nang – Đà Nẵng yên tĩnh",
+      "description": "Dành cho người không thích đông: tăng cafe, beach walk, Sơn Trà, sunset, slow travel.",
+      "default_days": 3,
+      "default_nights": 2,
+      "budget_min": 3500000,
+      "budget_max": 5500000,
+      "travel_style": "quiet",
+      "intensity": "slow",
+      "suitable_for": ["solo", "couple", "introvert"],
+      "intent_keywords": [
+        "yên tĩnh", "im lặng", "tránh đông", "không thích đông", "ít người",
+        "chill", "chữa lành", "healing", "nghỉ ngơi", "tĩnh lặng"
+      ],
+      "preference_keywords": [
+        "yên tĩnh", "quiet", "peaceful", "thanh bình", "hidden", "ít người", "morning"
+      ],
+      "preferred_categories": [
+        "beach", "food", "cultural", "sightseeing"
+      ],
+      "preferred_tags": [
+        "quiet", "peaceful", "nature", "sea view", "morning", "hidden", "pagoda", "forest"
+      ],
+      "excluded_tags": [
+        "nightlife", "party", "crowded", "market", "shopping", "festival"
+      ],
+      "preferred_price_levels": ["$", "$$"],
+      "budget_weight": 0.7,
+      "rating_weight": 1.2,
+      "popularity_weight": 0.3,
+      "distance_weight": 0.5,
+      "preference_weight": 1.6,
+      "rules": {
+        "min_rating": 4.3,
+        "min_review_count": 500,
+        "max_places_per_day": 3,
+        "max_travel_minutes_per_day": 180,
+        "min_relax_time_per_day": 180,
+        "max_popularity": 0.3,
+        "max_hotel_avg_cost": 900000
+      },
+      "itinerary_rules": [
+        "Tối đa 3 địa điểm/ngày",
+        "Tránh night market, festival, party",
+        "Ưu tiên best_time = Morning hoặc All year yên tĩnh",
+        "Có khoảng nghỉ dài giữa trưa"
+      ],
+      "tags": [
+        "quiet", "peaceful", "slow", "couple", "solo"
+      ]
+    },
+    {
+      "id": "DNA02",
+      "plan_type": "adaptive",
+      "name": "Romantic Da Nang – Chuyến đi dành cho hai người",
+      "description": "Beach, sunset, cafe đẹp, dinner view, không gian riêng tư. Honeymoon/anniversary/date trip.",
+      "default_days": 3,
+      "default_nights": 2,
+      "budget_min": 6000000,
+      "budget_max": 10000000,
+      "travel_style": "romantic",
+      "intensity": "slow",
+      "suitable_for": ["couple", "honeymoon", "anniversary"],
+      "intent_keywords": [
+        "lãng mạn", "romantic", "honeymoon", "tuần trăng mật", "kỷ niệm",
+        "anniversary", "đi với người yêu", "đi cặp đôi", "đi vợ chồng"
+      ],
+      "preference_keywords": [
+        "romantic", "sunset", "view", "private", "dinner", "luxury", "resort"
+      ],
+      "preferred_categories": [
+        "beach", "food", "hotel", "sightseeing"
+      ],
+      "preferred_tags": [
+        "romantic", "sunset", "sea view", "luxury", "resort", "5-star", "spa", "fine dining"
+      ],
+      "excluded_tags": [
+        "crowded", "market", "backpacker", "hostel"
+      ],
+      "preferred_price_levels": ["$$", "$$$"],
+      "budget_weight": 0.5,
+      "rating_weight": 1.4,
+      "popularity_weight": 0.7,
+      "distance_weight": 0.6,
+      "preference_weight": 1.5,
+      "rules": {
+        "min_rating": 4.4,
+        "min_review_count": 1000,
+        "max_places_per_day": 3,
+        "max_travel_minutes_per_day": 180,
+        "min_relax_time_per_day": 180,
+        "max_hotel_avg_cost": 3500000
+      },
+      "itinerary_rules": [
+        "Tối đa 3 địa điểm/ngày",
+        "Phải có 1 sunset spot mỗi ngày",
+        "Dinner view sông hoặc view biển",
+        "Có thời gian riêng tư cho 2 người"
+      ],
+      "tags": [
+        "romantic", "couple", "honeymoon", "sunset"
+      ]
+    },
+    {
+      "id": "DNA03",
+      "plan_type": "adaptive",
+      "name": "Budget Da Nang – Đà Nẵng tiết kiệm",
+      "description": "Hostel/hotel giá rẻ, ăn local, điểm miễn phí, di chuyển tiết kiệm. Sinh viên/backpacker/solo.",
+      "default_days": 3,
+      "default_nights": 2,
+      "budget_min": 2500000,
+      "budget_max": 4000000,
+      "travel_style": "budget",
+      "intensity": "balanced",
+      "suitable_for": ["student", "backpacker", "solo"],
+      "intent_keywords": [
+        "tiết kiệm", "budget", "sinh viên", "student", "rẻ", "backpacker",
+        "đi một mình", "ít tiền", "tiền ít"
+      ],
+      "preference_keywords": [
+        "cheap", "affordable", "local", "free", "tiết kiệm"
+      ],
+      "preferred_categories": [
+        "sightseeing", "food", "cultural", "beach"
+      ],
+      "preferred_tags": [
+        "cheap", "affordable", "local", "free", "iconic", "beach", "hostel", "street food"
+      ],
+      "excluded_tags": [
+        "luxury", "5-star", "fine dining", "resort"
+      ],
+      "preferred_price_levels": ["$"],
+      "budget_weight": 1.5,
+      "rating_weight": 0.9,
+      "popularity_weight": 1.0,
+      "distance_weight": 0.8,
+      "preference_weight": 1.2,
+      "rules": {
+        "min_rating": 4.0,
+        "min_review_count": 200,
+        "max_places_per_day": 4,
+        "max_travel_minutes_per_day": 240,
+        "min_relax_time_per_day": 60,
+        "max_avg_cost": 100000,
+        "max_price_level": "$$",
+        "max_hotel_avg_cost": 550000
+      },
+      "itinerary_rules": [
+        "Tối đa 4 địa điểm/ngày",
+        "Ưu tiên điểm miễn phí (avg_cost = 0)",
+        "Ăn ở chợ local, quán bình dân",
+        "Di chuyển bằng xe máy/grab"
+      ],
+      "tags": [
+        "budget", "student", "backpacker", "cheap"
+      ]
+    }
+  ]
+}

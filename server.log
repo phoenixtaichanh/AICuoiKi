@@ -1,0 +1,234 @@
+﻿.\.venv\Scripts\python.exe : Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to 
+enable higher rate limits and faster downloads.
+At C:\Users\LOQ\AppData\Local\Temp\ps-script-b33461b3-8610-4798-b271-c172841fa254.ps1:113 char:73
++ ... ONIOENCODING="utf-8"; .\.venv\Scripts\python.exe main.py 2>&1 | Out-F ...
++                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Warning: You ar...ster downloads.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Γ£à Loaded cleaned CSV dataset
+Loading Bi-encoder model...
+
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]
+Loading weights:  22%|ΓûêΓûêΓûÅ       | 43/199 [00:00<00:00, 414.30it/s]
+Loading weights:  48%|ΓûêΓûêΓûêΓûêΓûè     | 96/199 [00:00<00:00, 474.10it/s]
+Loading weights: 100%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûê| 199/199 [00:00<00:00, 744.87it/s]
+Loaded embeddings: (557, 768)
+Loading Cross-encoder: BAAI/bge-reranker-v2-m3
+
+Loading weights:   0%|          | 0/393 [00:00<?, ?it/s]
+Loading weights:  10%|Γûë         | 38/393 [00:00<00:01, 331.47it/s]
+Loading weights:  18%|ΓûêΓûè        | 72/393 [00:00<00:00, 334.29it/s]
+Loading weights:  28%|ΓûêΓûêΓûè       | 112/393 [00:00<00:00, 346.51it/s]
+Loading weights:  41%|ΓûêΓûêΓûêΓûê      | 161/393 [00:00<00:00, 344.18it/s]
+Loading weights:  56%|ΓûêΓûêΓûêΓûêΓûêΓûî    | 219/393 [00:00<00:00, 385.86it/s]
+Loading weights:  66%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûî   | 258/393 [00:00<00:00, 335.97it/s]
+Loading weights:  75%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûì  | 294/393 [00:00<00:00, 338.45it/s]
+Loading weights:  84%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûÄ | 329/393 [00:00<00:00, 312.24it/s]
+Loading weights:  94%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûÄ| 368/393 [00:01<00:00, 327.48it/s]
+Loading weights: 100%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûê| 393/393 [00:01<00:00, 358.88it/s]
+Γ£à Cross-encoder loaded successfully
+Γ£à Cross-encoder reranker loaded
+Loaded 557 places
+   ΓÜá∩╕Å Q&A.csv not found at data/Q&A.csv, using places.csv only
+
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]
+Loading weights:  24%|ΓûêΓûêΓûì       | 48/199 [00:00<00:00, 453.62it/s]
+Loading weights:  53%|ΓûêΓûêΓûêΓûêΓûêΓûÄ    | 106/199 [00:00<00:00, 523.72it/s]
+Loading weights:  80%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûë  | 159/199 [00:00<00:00, 468.33it/s]
+Loading weights: 100%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûê| 199/199 [00:00<00:00, 589.97it/s]
+INFO:     Will watch for changes in these directories: ['D:\\AI-For-Life-main\\AI-For-Life-main']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [19980] using StatReload
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits 
+and faster downloads.
+Γ£à Loaded cleaned CSV dataset
+Loading Bi-encoder model...
+
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]
+Loading weights:  12%|ΓûêΓûÅ        | 23/199 [00:00<00:00, 205.27it/s]
+Loading weights:  22%|ΓûêΓûêΓûÅ       | 44/199 [00:00<00:00, 166.55it/s]
+Loading weights:  31%|ΓûêΓûêΓûê       | 62/199 [00:00<00:00, 140.10it/s]
+Loading weights: 100%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûê| 199/199 [00:00<00:00, 471.46it/s]
+Loaded embeddings: (557, 768)
+Loading Cross-encoder: BAAI/bge-reranker-v2-m3
+
+Loading weights:   0%|          | 0/393 [00:00<?, ?it/s]
+Loading weights:   5%|Γûì         | 18/393 [00:00<00:02, 158.06it/s]
+Loading weights:   9%|Γûè         | 34/393 [00:00<00:02, 133.07it/s]
+Loading weights:  12%|ΓûêΓûÅ        | 48/393 [00:00<00:02, 115.30it/s]
+Loading weights:  15%|ΓûêΓûî        | 60/393 [00:00<00:03, 103.93it/s]
+Loading weights:  18%|ΓûêΓûè        | 71/393 [00:00<00:03, 86.50it/s] 
+Loading weights:  21%|ΓûêΓûê        | 83/393 [00:00<00:03, 91.03it/s]
+Loading weights:  24%|ΓûêΓûêΓûì       | 94/393 [00:00<00:03, 93.30it/s]
+Loading weights:  27%|ΓûêΓûêΓûï       | 105/393 [00:01<00:02, 97.24it/s]
+Loading weights:  30%|ΓûêΓûêΓûë       | 116/393 [00:01<00:02, 99.63it/s]
+Loading weights:  33%|ΓûêΓûêΓûêΓûÄ      | 130/393 [00:01<00:02, 94.95it/s]
+Loading weights:  36%|ΓûêΓûêΓûêΓûî      | 140/393 [00:01<00:02, 85.90it/s]
+Loading weights: 100%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûê| 393/393 [00:01<00:00, 253.58it/s]
+Γ£à Cross-encoder loaded successfully
+Γ£à Cross-encoder reranker loaded
+Loaded 557 places
+   ΓÜá∩╕Å Q&A.csv not found at data/Q&A.csv, using places.csv only
+
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]
+Loading weights:  11%|Γûê         | 22/199 [00:00<00:00, 215.18it/s]
+Loading weights:  22%|ΓûêΓûêΓûÅ       | 44/199 [00:00<00:00, 217.06it/s]
+Loading weights:  33%|ΓûêΓûêΓûêΓûÄ      | 66/199 [00:00<00:00, 200.09it/s]
+Loading weights:  44%|ΓûêΓûêΓûêΓûêΓûÄ     | 87/199 [00:00<00:00, 184.60it/s]
+Loading weights: 100%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûê| 199/199 [00:00<00:00, 402.35it/s]
+INFO:     Started server process [26396]
+INFO:     Waiting for application startup.
+INFO:src.vision_qa_huggingface:Γ£à Hugging Face Vision QA loaded 557 places from CSV
+INFO:httpx:HTTP Request: GET https://huggingface.co/api/models/Salesforce/blip-image-captioning-base/revision/main 
+"HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://huggingface.co/api/models/Salesforce/blip-image-captioning-base/tree/main/addition
+al_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+INFO:httpx:HTTP Request: GET https://huggingface.co/api/models/Salesforce/blip-image-captioning-base/tree/main/addition
+al_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+INFO:httpx:HTTP Request: GET 
+https://huggingface.co/api/models/Salesforce/blip-image-captioning-base/tree/main?recursive=true&expand=false 
+"HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://huggingface.co/api/models/Salesforce/blip-image-captioning-base/revision/main 
+"HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: HEAD 
+https://huggingface.co/Salesforce/blip-image-captioning-base/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+Γ£à Loaded 0 place details from data/placesdetail.csv
+≡ƒöä Loading QA System...
+   ≡ƒôü Loaded data from data/places.csv
+   Γ£à QA System ready with 557 places
+============================================================
+≡ƒÜÇ KHß╗₧I Tß║áO Hß╗å THß╗ÉNG
+============================================================
+
+≡ƒöì Khß╗ƒi tß║ío Google Search API...
+
+≡ƒñû Khß╗ƒi tß║ío LLM Processor...
+
+============================================================
+≡ƒÜÇ KHß╗₧I Tß║áO VISION QA
+============================================================
+≡ƒöì DEBUG: HF_USE_API = False
+≡ƒöì DEBUG: HF_MODEL = Salesforce/blip-image-captioning-base
+≡ƒöº ─Éang khß╗ƒi tß║ío Hugging Face Vision QA (HO├ÇN TO├ÇN MIß╗äN PH├ì)...
+
+Loading weights:   0%|          | 0/473 [00:00<?, ?it/s]INFO:httpx:HTTP Request: GET 
+https://huggingface.co/api/models/Salesforce/blip-image-captioning-base "HTTP/1.1 200 OK"
+
+Loading weights: 100%|ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûê| 473/473 [00:00<00:00, 20190.37it/s]
+INFO:     Application startup complete.
+INFO:httpx:HTTP Request: GET https://huggingface.co/api/models/Salesforce/blip-image-captioning-base/commits/main 
+"HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://huggingface.co/api/models/Salesforce/blip-image-captioning-base/discussions?p=0 
+"HTTP/1.1 200 OK"
+Γ£à Loaded local model: Salesforce/blip-image-captioning-base
+Γ£à Hugging Face Vision QA initialized (API: False, Model: Salesforce/blip-image-captioning-base)
+≡ƒÄë HUGGING FACE VISION QA KHß╗₧I Tß║áO TH├ÇNH C├öNG! (HO├ÇN TO├ÇN MIß╗äN PH├ì)
+Γ£à Model: Salesforce/blip-image-captioning-base
+Γ£à Use API: False
+Γ£à Vision instance: True
+Γ£à Th╞░ mß╗Ñc temp_uploads v├á test_images ─æ├ú ─æ╞░ß╗úc tß║ío
+============================================================
+≡ƒÄ» TRß║áNG TH├üI CUß╗ÉI C├ÖNG:
+   ΓÇó Vision Mode: huggingface
+   ΓÇó Vision QA Active: True
+   ΓÇó Hugging Face Model: Salesforce/blip-image-captioning-base
+   ΓÇó Use API: false
+============================================================
+INFO:     127.0.0.1:63040 - "GET / HTTP/1.1" 200 OK
+INFO:httpx:HTTP Request: GET 
+https://huggingface.co/api/models/Salesforce/blip-image-captioning-base/commits/refs%2Fpr%2F52 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: HEAD 
+https://huggingface.co/Salesforce/blip-image-captioning-base/resolve/refs%2Fpr%2F52/model.safetensors.index.json 
+"HTTP/1.1 404 Not Found"
+INFO:httpx:HTTP Request: HEAD 
+https://huggingface.co/Salesforce/blip-image-captioning-base/resolve/refs%2Fpr%2F52/model.safetensors "HTTP/1.1 302 
+Found"
+Γ£à Loaded 8 plans for danang
+Γ£à Loaded 8 plans for hoian
+Γ£à Loaded 8 plans for hue
+INFO:     127.0.0.1:63045 - "GET /api/travel-plans/danang HTTP/1.1" 200 OK
+Γ£à Loaded 8 plans for danang
+Γ£à Loaded 8 plans for hoian
+Γ£à Loaded 8 plans for hue
+INFO:     127.0.0.1:63047 - "GET /api/travel-plans HTTP/1.1" 200 OK
+Γ£à Loaded 8 plans for danang
+Γ£à Loaded 8 plans for hoian
+Γ£à Loaded 8 plans for hue
+Γ£à Plan engine loaded dataset: data/itinerary_dataset.clean.csv (557 rows)
+INFO:     127.0.0.1:63049 - "POST /api/travel-plans/match HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "D:\AI-For-Life-main\AI-For-Life-main\.venv\Lib\site-packages\uvicorn\protocols\http\h11_impl.py", line 403, in 
+run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AI-For-Life-main\AI-For-Life-main\.venv\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 60, in 
+__call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AI-For-Life-main\AI-For-Life-main\.venv\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "D:\AI-For-Life-main\AI-For-Life-main\.venv\Lib\site-packages\starlette\applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "D:\AI-For-Life-main\AI-For-Life-main\.venv\Lib\site-packages\starlette\middleware\errors.py", line 186, in 
+__call__
+    raise exc
+  File "D:\AI-For-Life-main\AI-For-Life-main\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in 
+__call__
+    await self.app(scope, receive, _send)
+  File "D:\AI-For-Life-main\AI-For-Life-main\.venv\Lib\site-packages\starlette\middleware\cors.py", line 85, in 
+__call__
+    await self.app(scope, receive, send)
+  File "D:\AI-For-Life-main\AI-For-Life-main\.venv\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in 
+__call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "D:\AI-For-Life-main\AI-For-Life-main\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in 
+wrapped_app
+    raise exc
+  File "D:\AI-For-Life-main\AI-For-Life-main\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in 
+wrapped_app
+    await app(scope, receive, sender)
+  File "D:\AI-For-Life-main\AI-For-Life-main\.venv\Lib\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "D:\AI-For-Life-main\AI-For-Life-main\.venv\Lib\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "D:\AI-For-Life-main\AI-For-Life-main\.venv\Lib\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "D:\AI-For-Life-main\AI-For-Life-main\.venv\Lib\site-packages\starlette\routing.py", line 78, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "D:\AI-For-Life-main\AI-For-Life-main\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in 
+wrapped_app
+    raise exc
+  File "D:\AI-For-Life-main\AI-For-Life-main\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in 
+wrapped_app
+    await app(scope, receive, sender)
+  File "D:\AI-For-Life-main\AI-For-Life-main\.venv\Lib\site-packages\starlette\routing.py", line 75, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "D:\AI-For-Life-main\AI-For-Life-main\.venv\Lib\site-packages\fastapi\routing.py", line 339, in app
+    response = actual_response_class(content, **response_args)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AI-For-Life-main\AI-For-Life-main\.venv\Lib\site-packages\starlette\responses.py", line 190, in __init__
+    super().__init__(content, status_code, headers, media_type, background)
+  File "D:\AI-For-Life-main\AI-For-Life-main\.venv\Lib\site-packages\starlette\responses.py", line 47, in __init__
+    self.body = self.render(content)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "D:\AI-For-Life-main\AI-For-Life-main\.venv\Lib\site-packages\starlette\responses.py", line 193, in render
+    return json.dumps(
+           ^^^^^^^^^^^
+  File "C:\Users\LOQ\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "C:\Users\LOQ\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 200, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LOQ\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 258, in iterencode
+    return _iterencode(o, 0)
+           ^^^^^^^^^^^^^^^^^
+ValueError: Out of range float values are not JSON compliant
+WARNING:  StatReload detected changes in 'src\plans\plan_engine.py'. Reloading...
+Γ£à Loaded 0 place details from data/placesdetail.csv
+≡ƒöä Loading QA System...
+   ≡ƒôü Loaded data from data/places.csv
+   Γ£à QA System ready with 557 places

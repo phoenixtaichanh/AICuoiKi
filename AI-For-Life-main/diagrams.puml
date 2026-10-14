@@ -1,0 +1,866 @@
+@startuml UseCaseDiagram
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam usecase {
+    BackgroundColor #E1F5FE
+    BorderColor #01579B
+}
+skinparam actor {
+    BackgroundColor #FFF9C4
+    BorderColor #F57F17
+}
+
+title Use Case Diagram - AI Travel Assistant System
+
+actor "User" as User
+actor "Administrator" as Admin
+
+package "AI Travel Assistant System" {
+    usecase "Login" as UC_LOGIN
+    usecase "Register" as UC_REGISTER
+    usecase "Logout" as UC_LOGOUT
+    usecase "Plan Travel Itinerary" as UC1
+    usecase "Q&A about Places" as UC2
+    usecase "Recognize Place from Image" as UC3
+    usecase "Smart Search" as UC4
+    usecase "Google Search" as UC5
+    usecase "Process Query with LLM" as UC6
+    usecase "View Recommendation Explanations" as UC7
+    usecase "Validate Itinerary" as UC8
+    usecase "Upload Image" as UC9
+    usecase "Crawl Place Data" as UC10
+    usecase "Clean Data" as UC11
+    usecase "Save Chat History" as UC12
+}
+
+User --> UC_LOGIN : "Enter username\nand password"
+User --> UC_REGISTER : "Create new\naccount"
+User --> UC_LOGOUT : "Logout"
+User --> UC1 : "Enter natural\nlanguage query"
+User --> UC2 : "Ask questions\nabout places"
+User --> UC3 : "Upload place\nimage"
+User --> UC4 : "Smart query\n(auto routing)"
+User --> UC9 : "Select image file"
+User --> UC7 : "View recommendation\nreasons"
+User --> UC12 : "Save chat history"
+
+Admin --> UC10 : "Update\ndata"
+Admin --> UC11 : "Normalize\ndata"
+
+UC_LOGIN ..> UC12 : "include"
+UC1 ..> UC_LOGIN : "extend\n(requires login)"
+UC2 ..> UC_LOGIN : "extend\n(requires login)"
+UC3 ..> UC_LOGIN : "extend\n(requires login)"
+
+UC1 ..> UC8 : "include"
+UC1 ..> UC7 : "include"
+UC4 ..> UC1 : "extend"
+UC4 ..> UC2 : "extend"
+UC4 ..> UC5 : "extend"
+UC4 ..> UC6 : "extend"
+UC3 ..> UC2 : "extend"
+UC9 ..> UC3 : "include"
+
+note right of UC_LOGIN
+  Simple login system:
+  - Check localStorage
+  - Validate username/password
+  - Save currentUser
+  - Load chat history
+end note
+
+note right of UC_REGISTER
+  Register new account:
+  - Validate input
+  - Check username exists
+  - Hash password
+  - Add to database
+end note
+
+note right of UC1
+  Auto extract:
+  - Budget (default: 3M VND)
+  - Days (default: 1)
+  - Travel companion (default: solo)
+  - City
+end note
+
+note right of UC3
+  Supports:
+  - Gemini (free)
+  - OpenAI Vision
+  - Hugging Face
+end note
+
+@enduml
+
+@startuml ActivityDiagram_Itinerary
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam activity {
+    BackgroundColor #E8F5E9
+    BorderColor #2E7D32
+}
+skinparam decision {
+    BackgroundColor #FFF3E0
+    BorderColor #E65100
+}
+
+title Activity Diagram - Travel Itinerary Planning
+
+start
+
+:User enters query;
+
+:Query Extractor extracts information;
+note right
+  - Budget (default: 3M VND)
+  - Days (default: 1)
+  - City (default: Da Nang)
+  - Travel companion (default: solo)
+end note
+
+if (LLM available?) then (yes)
+  :LLM Processor processes query;
+  :Enhance query;
+else (no)
+endif
+
+:Recommender.encode_query();
+:Calculate cosine similarity;
+:Filter by city;
+
+if (Cross-Encoder available?) then (yes)
+  :Rerank with Cross-Encoder;
+else (no)
+endif
+
+:Apply diversity filter;
+:Classify by category\n(sightseeing, food, hotel, event);
+
+:Optimize slot selection;
+note right
+  - Morning (09:00)
+  - Lunch (12:00)
+  - Afternoon (15:00)
+  - Evening (19:00)
+  - Hotel
+end note
+
+:Calculate distances\n(Haversine);
+:Check opening hours;
+:Check budget constraints;
+
+if (Validate plan?) then (yes)
+  :Plan Guard validates;
+  if (Valid?) then (yes)
+  else (no)
+    :Add warnings;
+  endif
+endif
+
+if (Include explanation?) then (yes)
+  :Explain Ability\ngenerates explanations;
+else (no)
+endif
+
+:Return itinerary;
+
+stop
+
+@enduml
+
+@startuml ActivityDiagram_QA
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam activity {
+    BackgroundColor #E3F2FD
+    BorderColor #1565C0
+}
+skinparam decision {
+    BackgroundColor #FFF3E0
+    BorderColor #E65100
+}
+
+title Activity Diagram - Q&A System
+
+start
+
+:User asks question;
+
+:Check Q&A.csv database;
+
+if (Found in Q&A.csv?) then (yes)
+  :Return answer from Q&A.csv;
+  stop
+else (no)
+endif
+
+:Extract question type;
+note right
+  - general_info
+  - location
+  - opening_hours
+  - price
+  - best_time
+end note
+
+:Fuzzy match with place names;
+
+if (Match found?) then (yes)
+  :Return place info;
+  stop
+else (no)
+endif
+
+if (Embedding model available?) then (yes)
+  :Semantic search;
+  if (Found?) then (yes)
+    :Return place info;
+    stop
+  else (no)
+  endif
+else (no)
+endif
+
+if (Google Search available?) then (yes)
+  :Search on Google;
+  :Return Google results;
+else (no)
+  :Return "Not found";
+endif
+
+stop
+
+@enduml
+
+@startuml ActivityDiagram_Vision
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam activity {
+    BackgroundColor #F3E5F5
+    BorderColor #6A1B9A
+}
+skinparam decision {
+    BackgroundColor #FFF3E0
+    BorderColor #E65100
+}
+
+title Activity Diagram - Vision Q&A
+
+start
+
+:User uploads image;
+
+if (Local file?) then (yes)
+  :Load image from file;
+else (URL?)
+  :Download image from URL;
+endif
+
+:Validate image format;
+:Resize if needed;
+
+if (Vision provider?) then (Gemini)
+  :Gemini Vision API\nanalyzes image;
+elseif (OpenAI)
+  :OpenAI Vision API\nanalyzes image;
+elseif (Hugging Face)
+  :Hugging Face model\nanalyzes image;
+else (none)
+  :Return error;
+  stop
+endif
+
+:Extract place name from response;
+
+if (Place name found?) then (yes)
+  :Fuzzy match with CSV;
+  if (Match in database?) then (yes)
+    :Return place info\n+ matched data;
+  else (no)
+    :Return place name\n+ basic info;
+  endif
+else (no)
+  :Return "Cannot recognize";
+endif
+
+:Auto query information\nabout place;
+
+stop
+
+@enduml
+
+@startuml ActivityDiagram_Authentication
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam activity {
+    BackgroundColor #E8F5E9
+    BorderColor #2E7D32
+}
+skinparam decision {
+    BackgroundColor #FFF3E0
+    BorderColor #E65100
+}
+
+title Activity Diagram - Authentication Flow (Login / Register / Logout)
+
+start
+
+:User opens application;
+
+:Check localStorage\nfor currentUser;
+
+if (Already logged in?) then (yes)
+  :Load chat history;
+  :Display main interface;
+  
+  if (User chooses logout?) then (yes)
+    :Confirm logout\n(if needed);
+    if (Confirmed?) then (no)
+      :Cancel;
+      stop
+    else (yes)
+    endif
+    :Remove currentUser\nfrom localStorage;
+    :Clear chat history\nor save to server;
+    :Hide user info;
+    :Clear chat messages\nfrom UI;
+    :Show login modal;
+  else (no)
+    :Continue using;
+    stop
+  endif
+else (no)
+endif
+
+:Show login modal;
+
+if (User chooses action?) then (Login)
+  :User enters\nusername and password;
+  :Validate input\n(not empty);
+  
+  if (Input valid?) then (no)
+    :Show error\n"Please fill all fields";
+    stop
+  else (yes)
+  endif
+  
+  :Check USERS database\nor API;
+  
+  if (Username exists?) then (no)
+    :Show error\n"Invalid username or password";
+    stop
+  else (yes)
+  endif
+  
+  if (Password correct?) then (no)
+    :Show error\n"Invalid username or password";
+    stop
+  else (yes)
+  endif
+  
+  :Set currentUser\nin localStorage;
+  :Hide login modal;
+  :Display user info\n(username display);
+  :Load chat history\nof user;
+  :Display main interface;
+  stop
+  
+elseif (Register) then
+  :Show register form;
+  :User enters information:
+  - Username
+  - Password
+  - Confirm Password
+  - Email (optional);
+  :Validate input;
+  
+  if (Username empty?) then (yes)
+    :Show error\n"Username cannot be empty";
+    stop
+  else (no)
+  endif
+  
+  if (Password empty?) then (yes)
+    :Show error\n"Password cannot be empty";
+    stop
+  else (no)
+  endif
+  
+  if (Password < 4 characters?) then (yes)
+    :Show error\n"Password must be at least 4 characters";
+    stop
+  else (no)
+  endif
+  
+  if (Password != Confirm?) then (no match)
+    :Show error\n"Password confirmation does not match";
+    stop
+  else (match)
+  endif
+  
+  :Check username\nin database/API;
+  
+  if (Username already exists?) then (yes)
+    :Show error\n"Username already in use";
+    stop
+  else (no)
+  endif
+  
+  :Hash password\n(if needed);
+  :Add user to database\nor USERS object;
+  :Show message\n"Registration successful";
+  :Auto login\nwith new user;
+  :Set currentUser\nin localStorage;
+  :Hide register form;
+  :Display main interface;
+  stop
+  
+else (Cancel)
+  :Close modal;
+  stop
+endif
+
+stop
+
+@enduml
+
+
+@startuml ClassDiagram
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam class {
+    BackgroundColor #E8F5E9
+    BorderColor #2E7D32
+    ArrowColor #1565C0
+}
+
+title Class Diagram - AI Travel Assistant System
+
+package "Core Components" {
+    class Recommender {
+        - df: DataFrame
+        - model: SentenceTransformer
+        - embeddings: ndarray
+        - reranker: CrossEncoderReranker
+        + __init__()
+        + encode_query(query: str): ndarray
+        + calculate_nn_cos(): ndarray
+        + recommend(): List[Dict]
+        + itinerary(): Dict
+        + _optimize_slot_selection(): DataFrame
+        + diversity_filter(): List[Dict]
+    }
+    
+    class CrossEncoderReranker {
+        - tokenizer: AutoTokenizer
+        - model: AutoModel
+        + __init__()
+        + rerank(): List[float]
+    }
+    
+    class QASystem {
+        - df: DataFrame
+        - qa_df: DataFrame
+        - model: SentenceTransformer
+        - embeddings: ndarray
+        + __init__()
+        + answer_question(): Dict
+        + _fuzzy_match_name(): Dict
+        + _semantic_search(): Dict
+        + _match_qa_database(): Dict
+    }
+    
+    class QueryExtractor {
+        + extract_budget(): int
+        + extract_days(): int
+        + extract_travel_companion(): str
+        + extract_city(): str
+        + extract_all(): Dict
+    }
+    
+    class PlanGuard {
+        + validate_budget(): Dict
+        + validate_distance(): Dict
+        + validate_time_slots(): Dict
+        + validate_day(): Dict
+        + validate_itinerary(): Dict
+        + haversine(): float
+    }
+    
+    class ExplainAbility {
+        + explain_recommendation(): str
+        + explain_itinerary_slot(): str
+        + explain_day(): Dict
+        + explain_full_itinerary(): Dict
+    }
+}
+
+package "Vision & AI" {
+    class OpenAIVisionQA {
+        - client: OpenAI
+        - model: str
+        - df_places: DataFrame
+        + __init__()
+        + recognize_place(): Dict
+        + _download_image(): Image
+        + _parse_openai_response(): Dict
+        + _fuzzy_match_place(): Dict
+    }
+    
+    class LLMProcessor {
+        - provider: str
+        - model: str
+        - client: Any
+        + __init__()
+        + process_query(): Dict
+        + enhance_query(): str
+        + _process_openai(): Dict
+        + _process_gemini(): Dict
+    }
+    
+    class GoogleSearchAPI {
+        - api_key: str
+        - search_engine_id: str
+        + __init__()
+        + search(): List[Dict]
+        + search_place_info(): Dict
+        + search_travel_tips(): List[Dict]
+    }
+}
+
+package "Data Processing" {
+    class DataNormalizer {
+        + normalize_name(): str
+        + normalize_address(): str
+        + normalize_time(): int
+        + normalize_cost(): float
+    }
+    
+    class Deduplicator {
+        + find_duplicates(): List
+        + merge_places(): DataFrame
+    }
+}
+
+package "API Layer" {
+    class FastAPI {
+        + app: FastAPI
+        + startup_event()
+        + route_query(): str
+    }
+}
+
+Recommender --> CrossEncoderReranker : uses
+Recommender --> QueryExtractor : uses
+Recommender --> PlanGuard : uses
+Recommender --> ExplainAbility : uses
+QASystem --> QueryExtractor : uses
+FastAPI --> Recommender : uses
+FastAPI --> QASystem : uses
+FastAPI --> OpenAIVisionQA : uses
+FastAPI --> LLMProcessor : uses
+FastAPI --> GoogleSearchAPI : uses
+OpenAIVisionQA --> QASystem : extends
+LLMProcessor --> QueryExtractor : enhances
+
+note right of Recommender
+  Core recommendation engine
+  - Bi-encoder (E5)
+  - Cross-encoder reranking
+  - Cosine similarity
+  - Haversine distance
+end note
+
+note right of QASystem
+  Q&A system with:
+  - Q&A.csv database
+  - Fuzzy matching
+  - Semantic search
+end note
+
+@enduml
+
+@startuml StateDiagram
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam state {
+    BackgroundColor #E1F5FE
+    BorderColor #01579B
+}
+
+title State Diagram - System Lifecycle & Query Processing
+
+' ========== SYSTEM INITIALIZATION ==========
+[*] --> Starting
+
+state Starting
+note right of Starting
+  Load env file
+end note
+
+Starting --> LoadingData : "Env loaded"
+
+state LoadingData
+note right of LoadingData
+  Load places.csv
+  Load QA.csv
+  Load embeddings
+end note
+
+LoadingData --> InitializingModels : "Data loaded"
+
+state InitializingModels
+note right of InitializingModels
+  Load SentenceTransformer
+  Load Cross-Encoder
+  Load embeddings
+end note
+
+InitializingModels --> CheckingAPIs : "Models loaded"
+
+state CheckingAPIs
+note right of CheckingAPIs
+  Check OpenAI API
+  Check Google Search API
+  Check LLM Provider
+end note
+
+CheckingAPIs --> InitializingVision : "APIs checked"
+
+state InitializingVision
+note right of InitializingVision
+  Init Gemini/OpenAI Vision
+  Set VISION_MODE
+end note
+
+InitializingVision --> Ready : "Vision initialized"
+
+' ========== READY STATE ==========
+state Ready
+note right of Ready
+  System ready
+  All services active
+end note
+
+Ready --> Processing : "Receive request"
+Ready --> [*] : "Shutdown"
+
+' ========== QUERY PROCESSING ==========
+Ready --> Processing : "Receive request"
+
+state Processing {
+  state Idle
+  state Extracting
+  state Routing
+  state QARouting
+  state ItineraryRouting
+  state Reranking
+  state SlotOptimization
+  state Validation
+  state Explanation
+  state GoogleSearch
+  state QAResult
+  state ItineraryResult
+  state NotFound
+  
+  Idle --> Extracting : "User enters query"
+  Extracting --> Routing : "Extract done"
+  Routing --> QARouting : "QA keywords"
+  Routing --> ItineraryRouting : "Itinerary keywords"
+  
+  QARouting --> QAResult : "Found"
+  QARouting --> GoogleSearch : "Not found"
+  QARouting --> NotFound : "Not found"
+  
+  ItineraryRouting --> Reranking : "Has Cross-Encoder"
+  ItineraryRouting --> SlotOptimization : "No Cross-Encoder"
+  Reranking --> SlotOptimization
+  SlotOptimization --> Validation : "Has validate"
+  Validation --> Explanation : "Valid/Invalid"
+  Explanation --> ItineraryResult
+  GoogleSearch --> QAResult
+}
+
+note right of Idle
+  Wait for user query
+end note
+
+note right of Extracting
+  Query Extractor extracts information
+end note
+
+note right of Routing
+  Classify query type
+end note
+
+note right of QARouting
+  Check QA.csv
+  Fuzzy match
+  Semantic search
+end note
+
+note right of ItineraryRouting
+  Encode query
+  Calculate similarity
+  Filter by city
+end note
+
+note right of Reranking
+  Cross-Encoder rerank
+end note
+
+note right of SlotOptimization
+  Optimize slots
+  Check distances
+  Check time
+  Check budget
+end note
+
+note right of Validation
+  Plan Guard validates
+end note
+
+note right of Explanation
+  Explain Ability generates explanations
+end note
+
+note right of GoogleSearch
+  Search on Google
+end note
+
+note right of QAResult
+  Return answer
+end note
+
+note right of ItineraryResult
+  Return itinerary
+end note
+
+note right of NotFound
+  Return Not found
+end note
+
+Processing --> Ready : "Request completed"
+QAResult --> Ready
+ItineraryResult --> Ready
+NotFound --> Ready
+
+@enduml
+
+@startuml SequenceDiagram
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam sequence {
+    ArrowColor #1565C0
+    LifeLineBorderColor #2E7D32
+    LifeLineBackgroundColor #E8F5E9
+}
+
+title Sequence Diagram - System Flow (Itinerary & Vision Q&A)
+
+actor User
+participant "Web UI" as UI
+participant "FastAPI" as API
+participant "QueryExtractor" as QE
+participant "LLMProcessor" as LLM
+participant "Recommender" as REC
+participant "CrossEncoder" as CE
+participant "PlanGuard" as PG
+participant "ExplainAbility" as EA
+participant "VisionQA" as VQA
+participant "Vision API\n(Gemini/OpenAI)" as VAPI
+participant "QASystem" as QA
+
+' ========== ITINERARY PLANNING FLOW ==========
+== Itinerary Planning ==
+
+User -> UI: Enter query "visit beach 3 days"
+UI -> API: GET /itinerary?q=...
+
+API -> QE: extract_all(query)
+QE -> QE: extract_budget()
+QE -> QE: extract_days()
+QE -> QE: extract_city()
+QE -> QE: extract_travel_companion()
+QE --> API: {budget: 3000000, days: 3, ...}
+
+alt Has LLM
+    API -> LLM: process_query(query)
+    LLM -> LLM: enhance_query()
+    LLM --> API: enhanced_query
+end
+
+API -> REC: recommend(query, city, ...)
+REC -> REC: encode_query()
+REC -> REC: calculate_nn_cos()
+REC -> REC: filter_by_city()
+
+alt Has Cross-Encoder
+    REC -> CE: rerank(query, documents)
+    CE -> CE: tokenize pairs
+    CE -> CE: calculate scores
+    CE --> REC: reranked_scores
+end
+
+REC -> REC: diversity_filter()
+REC -> REC: classify_by_category()
+REC -> REC: _optimize_slot_selection()
+REC -> REC: itinerary()
+REC --> API: itinerary_result
+
+alt Validate plan
+    API -> PG: validate_itinerary()
+    PG -> PG: validate_budget()
+    PG -> PG: validate_distance()
+    PG -> PG: validate_time_slots()
+    PG --> API: validation_result
+end
+
+alt Include explanation
+    API -> EA: explain_full_itinerary()
+    EA -> EA: explain_day()
+    EA -> EA: explain_recommendation()
+    EA --> API: explanations
+end
+
+API --> UI: JSON response
+UI --> User: Display itinerary
+
+' ========== VISION Q&A FLOW ==========
+== Vision Q&A ==
+
+User -> UI: Upload place image
+UI -> API: POST /ask_photo (file)
+
+API -> VQA: recognize_place(image_path)
+VQA -> VQA: _download_image() or load local
+
+VQA -> VAPI: analyze_image(image)
+VAPI -> VAPI: Vision model processing
+VAPI --> VQA: {place_name, confidence, reasoning}
+
+VQA -> VQA: _fuzzy_match_place(place_name)
+VQA -> VQA: Match with CSV database
+
+alt Found in database
+    VQA --> API: {success: true, matched: {...}}
+else Not found
+    VQA --> API: {success: true, place_name: "...", basic_info: {...}}
+end
+
+API --> UI: Vision result
+UI -> UI: Auto query information
+UI -> API: GET /ask?q=Information about [place_name]
+
+API -> QA: answer_question(query)
+QA -> QA: _match_qa_database()
+QA -> QA: _fuzzy_match_name()
+QA -> QA: _semantic_search()
+QA --> API: Answer
+
+API --> UI: Q&A result
+UI --> User: Display place information
+
+@enduml

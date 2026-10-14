@@ -1,0 +1,107 @@
+# -*- mode: python ; coding: utf-8 -*-
+"""PyInstaller spec for AI-For-Life launcher."""
+import os
+
+block_cipher = None
+
+datas = [
+    ("src", "src"),
+    ("data", "data"),
+    ("ui.html", "."),
+    (".env", "."),
+    ("nguoidung.txt", "."),
+    ("static", "static"),
+    ("models", "models"),
+]
+
+hiddenimports = [
+    "main",
+    "uvicorn",
+    "fastapi",
+    "starlette",
+    "starlette.middleware.cors",
+    "starlette.staticfiles",
+    "pydantic",
+    "pandas",
+    "numpy",
+    "sklearn",
+    "joblib",
+    "requests",
+    "dotenv",
+    "PIL",
+    "httpx",
+    "sentence_transformers",
+    "transformers",
+    "torch",
+    "rapidfuzz",
+    "openai",
+    "googleapiclient",
+    "googleapiclient.discovery",
+    "bs4",
+    "lxml",
+    "yaml",
+    "multipart",
+    "src.recommender",
+    "src.qa",
+    "src.query_extractor",
+    "src.plan_guard",
+    "src.explain_ability",
+    "src.google_search",
+    "src.llm_processor",
+    "src.user_manager",
+    "src.vision_qa_huggingface",
+    "src.vision_qa_openai",
+    "src.gemini_vision_qa",
+    "src.textnorm",
+    "src.scoring",
+    "src.schema",
+    "src.api",
+    "src.vectorizer",
+    "src.build_index",
+    "src.place_details",
+    "src.etl",
+    "src.plans.simple_matcher",
+    "src.plans.simple_endpoint",
+    "src.plans.index",
+    "src.plans.plan_engine",
+]
+
+a = Analysis(
+    ["run.py"],
+    pathex=["."],
+    binaries=[],
+    datas=datas,
+    hiddenimports=hiddenimports,
+    hookspath=[],
+    runtime_hooks=[],
+    excludes=[
+        "tkinter",
+        "matplotlib",
+        "PyQt5",
+        "PyQt6",
+        "notebook",
+        "ipykernel",
+        "jupyter",
+        "pytest",
+        "sphinx",
+    ],
+    cipher=block_cipher,
+    noarchive=False,
+)
+
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
+exe = EXE(
+    pyz,
+    a.scripts,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    [],
+    name="AI-For-Life",
+    debug=False,
+    strip=False,
+    upx=False,
+    console=True,
+    icon=None,
+)

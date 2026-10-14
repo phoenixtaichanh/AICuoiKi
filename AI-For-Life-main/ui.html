@@ -1,0 +1,2539 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Travel Planner — Chat UI</title>
+    <style>
+      :root {
+        --bg: #0a0a0a;
+        --panel: #111111;
+        --text: #e5e7eb;
+        --muted: #9aa4b2;
+        --accent: #22c55e;
+        --accent-hover: #16a34a;
+        --border: #1f1f1f;
+        --gradient-start: #0a0a0a;
+        --gradient-end: #151515;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: linear-gradient(135deg, #0a0a0a 0%, #0f0f0f 50%, #151515 100%);
+        background-attachment: fixed;
+        color: var(--text);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        min-height: 100vh;
+      }
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        height: 100dvh;
+        transition: margin-left 0.3s ease;
+      }
+
+      @media (min-width: 768px) {
+        .container {
+          margin-left: 320px;
+        }
+      }
+      .header {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+        background: linear-gradient(135deg, rgba(17, 17, 17, 0.95) 0%, rgba(10, 10, 10, 0.95) 100%);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+      }
+      .header h1 {
+        font-size: 20px;
+        margin: 0;
+        color: #e5e7eb;
+        font-weight: 600;
+        background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .header h1::before {
+        content: "🗺️";
+        font-size: 24px;
+        -webkit-text-fill-color: initial;
+      }
+      .chat {
+        flex: 1;
+        overflow: auto;
+        padding: 20px;
+      }
+      .msg {
+        display: flex;
+        margin: 10px 0;
+        gap: 10px;
+      }
+      .msg.user {
+        justify-content: flex-end;
+      }
+      .bubble {
+        max-width: 75%;
+        padding: 14px 16px;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        line-height: 1.5;
+        background: rgba(20, 20, 20, 0.8);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .bubble:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      }
+      .msg.user .bubble {
+        background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%);
+        border-color: rgba(34, 197, 94, 0.3);
+        box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+      }
+      .meta {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 6px;
+      }
+      .kv {
+        display: inline-flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        border: 1px dashed var(--border);
+        padding: 8px;
+        border-radius: 10px;
+        margin-top: 8px;
+      }
+      .kv span {
+        background: #0e1a33;
+        border: 1px solid #1c2a49;
+        border-radius: 999px;
+        padding: 4px 8px;
+        font-size: 12px;
+      }
+      .day {
+        margin: 10px 0;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .day summary {
+        cursor: pointer;
+        list-style: none;
+        padding: 10px 12px;
+        background: #0d162a;
+        border-bottom: 1px solid var(--border);
+      }
+      .day summary::-webkit-details-marker {
+        display: none;
+      }
+      .day table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .day th,
+      .day td {
+        border-bottom: 1px solid var(--border);
+        padding: 8px 10px;
+        text-align: left;
+        font-size: 14px;
+      }
+      .footer {
+        position: sticky;
+        bottom: 0;
+        background: linear-gradient(180deg, transparent 0%, rgba(10, 10, 10, 0.95) 20%, rgba(10, 10, 10, 0.98) 100%);
+        padding: 16px 20px 20px;
+        backdrop-filter: blur(10px);
+        border-top: 1px solid var(--border);
+      }
+      .row {
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+      }
+      .input {
+        flex: 1;
+        background: rgba(17, 17, 17, 0.9);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 12px 16px;
+        backdrop-filter: blur(10px);
+        transition: border-color 0.3s, box-shadow 0.3s;
+      }
+      .input:focus-within {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+      }
+      textarea {
+        width: 100%;
+        resize: none;
+        min-height: 56px;
+        max-height: 160px;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: var(--text);
+        font: inherit;
+        font-size: 15px;
+      }
+      textarea::placeholder {
+        color: var(--muted);
+      }
+      button.primary {
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+        border: none;
+        color: #ffffff;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 0 20px;
+        border-radius: 12px;
+        height: 48px;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+      }
+      button.primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+      }
+      button.primary:active {
+        transform: translateY(0);
+      }
+      .err {
+        color: #fecaca;
+      }
+      .upload-btn {
+        cursor: pointer;
+        padding: 0 14px;
+        font-size: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(17, 17, 17, 0.9);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        height: 48px;
+        transition: all 0.3s;
+        backdrop-filter: blur(10px);
+      }
+      .upload-btn:hover {
+        background: rgba(25, 25, 25, 0.95);
+        border-color: var(--accent);
+        transform: scale(1.05);
+      }
+
+      /* Modal Styles */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(8px);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .modal-container {
+        background: linear-gradient(135deg, rgba(17, 17, 17, 0.98) 0%, rgba(10, 10, 10, 0.98) 100%);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 32px;
+        max-width: 440px;
+        width: 90%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(34, 197, 94, 0.1);
+        backdrop-filter: blur(20px);
+        animation: slideUp 0.3s ease;
+      }
+
+      .modal-header {
+        text-align: center;
+        margin-bottom: 28px;
+      }
+
+      .modal-header h2 {
+        margin: 0 0 12px 0;
+        font-size: 28px;
+        font-weight: 700;
+        color: #22c55e;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-icon {
+        display: inline-block;
+        margin-right: 8px;
+      }
+
+      .modal-switch-btn {
+        background: none;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 14px;
+        padding: 8px;
+        transition: color 0.2s;
+      }
+
+      .modal-switch-btn:hover {
+        color: var(--accent);
+      }
+
+      .modal-switch-btn span {
+        color: #22c55e;
+        font-weight: 600;
+      }
+
+      .modal-body {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .form-group label {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .form-icon {
+        font-size: 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+      }
+
+      .required {
+        color: #ef4444;
+        font-weight: 600;
+        margin-left: 2px;
+      }
+
+      .optional {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: normal;
+        margin-left: 4px;
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 12px 16px;
+        background: rgba(20, 20, 20, 0.8);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        color: var(--text);
+        font-size: 15px;
+        transition: all 0.3s;
+        outline: none;
+      }
+
+      .form-input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+        background: rgba(25, 25, 25, 0.9);
+      }
+
+      .form-input::placeholder {
+        color: var(--muted);
+      }
+
+      .modal-submit-btn {
+        width: 100%;
+        margin-top: 8px;
+        padding: 14px 20px;
+        font-size: 16px;
+        font-weight: 600;
+        background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+        border: none;
+        color: white;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+      }
+
+      .modal-submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+      }
+
+      .modal-submit-btn:active {
+        transform: translateY(0);
+      }
+
+      .modal-submit-btn {
+        width: 100%;
+        margin-top: 8px;
+        padding: 14px 20px;
+        font-size: 16px;
+        font-weight: 600;
+        background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+        border: none;
+        color: white;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+      }
+
+      .modal-submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+      }
+
+      .modal-submit-btn:active {
+        transform: translateY(0);
+      }
+
+      #user-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 8px;
+        padding: 8px 12px;
+        background: rgba(34, 197, 94, 0.1);
+        border-radius: 8px;
+        border: 1px solid rgba(34, 197, 94, 0.2);
+      }
+
+      #user-info #username-display {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      #user-info #logout-btn {
+        color: var(--accent);
+        text-decoration: none;
+        padding: 4px 8px;
+        border-radius: 6px;
+        transition: background 0.2s;
+      }
+
+      #user-info #logout-btn:hover {
+        background: rgba(34, 197, 94, 0.2);
+      }
+
+      .chat {
+        scroll-behavior: smooth;
+      }
+
+      .chat::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .chat::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .chat::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 4px;
+      }
+
+      .chat::-webkit-scrollbar-thumb:hover {
+        background: var(--muted);
+      }
+
+      /* Sidebar Styles */
+      .sidebar-toggle-btn {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--text);
+        cursor: pointer;
+        padding: 8px 12px;
+        font-size: 18px;
+        transition: all 0.3s;
+      }
+
+      .sidebar-toggle-btn:hover {
+        background: rgba(26, 35, 50, 0.9);
+        border-color: var(--accent);
+      }
+
+      .chat-sidebar {
+        position: fixed;
+        left: -320px;
+        top: 0;
+        width: 320px;
+        height: 100vh;
+        background: linear-gradient(135deg, rgba(17, 17, 17, 0.98) 0%, rgba(10, 10, 10, 0.98) 100%);
+        border-right: 1px solid var(--border);
+        z-index: 999;
+        transition: left 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        backdrop-filter: blur(20px);
+        box-shadow: 2px 0 20px rgba(0, 0, 0, 0.8);
+      }
+
+      .chat-sidebar.active {
+        left: 0;
+      }
+
+      .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 998;
+        display: none;
+        backdrop-filter: blur(4px);
+      }
+
+      .sidebar-overlay.active {
+        display: block;
+      }
+
+      .sidebar-header {
+        padding: 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .sidebar-header h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        flex: 1;
+      }
+
+      .new-chat-btn, .sidebar-close-btn {
+        background: rgba(34, 197, 94, 0.2);
+        border: 1px solid rgba(34, 197, 94, 0.3);
+        border-radius: 8px;
+        color: var(--accent);
+        cursor: pointer;
+        padding: 6px 10px;
+        font-size: 16px;
+        transition: all 0.3s;
+      }
+
+      .new-chat-btn:hover {
+        background: rgba(34, 197, 94, 0.3);
+        transform: scale(1.1);
+      }
+
+      .sidebar-close-btn {
+        background: rgba(239, 68, 68, 0.2);
+        border-color: rgba(239, 68, 68, 0.3);
+        color: #ef4444;
+      }
+
+      .sidebar-close-btn:hover {
+        background: rgba(239, 68, 68, 0.3);
+      }
+
+      .chat-history-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 8px;
+      }
+
+      .chat-history-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px;
+        margin-bottom: 4px;
+        border-radius: 10px;
+        border: 1px solid transparent;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+
+      .chat-history-item:hover {
+        background: rgba(34, 197, 94, 0.1);
+        border-color: rgba(34, 197, 94, 0.2);
+      }
+
+      .chat-history-item.active {
+        background: rgba(34, 197, 94, 0.15);
+        border-color: var(--accent);
+      }
+
+      .chat-history-content {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .chat-history-title {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 4px;
+      }
+
+      .chat-history-date {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .chat-history-delete {
+        background: transparent;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+        padding: 4px;
+        font-size: 14px;
+        opacity: 0;
+        transition: all 0.2s;
+      }
+
+      .chat-history-item:hover .chat-history-delete {
+        opacity: 1;
+      }
+
+      .chat-history-delete:hover {
+        color: #ef4444;
+        transform: scale(1.2);
+      }
+
+      @media (min-width: 768px) {
+        .chat-sidebar {
+          left: 0;
+        }
+        .container {
+          margin-left: 320px;
+        }
+        .sidebar-overlay {
+          display: none !important;
+        }
+        .sidebar-close-btn {
+          display: none;
+        }
+      }
+
+      /* Loading animation */
+      .loading-dots {
+        display: inline-flex;
+        gap: 4px;
+      }
+
+      .loading-dots span {
+        animation: loading 1.4s infinite;
+        animation-fill-mode: both;
+      }
+
+      .loading-dots span:nth-child(1) {
+        animation-delay: 0s;
+      }
+
+      .loading-dots span:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      .loading-dots span:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      @keyframes loading {
+        0%, 80%, 100% {
+          opacity: 0.3;
+          transform: scale(0.8);
+        }
+        40% {
+          opacity: 1;
+          transform: scale(1.2);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <button id="sidebar-toggle" class="sidebar-toggle-btn" title="Lịch sử chat" style="display: none;">☰</button>
+          <h1>🗺️ Travel Planner Chat</h1>
+        </div>
+        <div id="user-info" style="display: none;">
+          <span style="color: var(--muted);">👤 Đăng nhập:</span>
+          <span id="username-display" style="color: var(--accent); font-weight: 600;"></span>
+          <span style="color: var(--muted); margin: 0 8px;">•</span>
+          <a href="#" id="logout-btn">Đăng xuất</a>
+        </div>
+      </div>
+
+      <!-- Chat History Sidebar -->
+      <div id="chat-sidebar" class="chat-sidebar">
+        <div class="sidebar-header">
+          <h3>💬 Lịch sử chat</h3>
+          <button id="new-chat-btn" class="new-chat-btn" title="Tạo chat mới">➕</button>
+          <button id="sidebar-close" class="sidebar-close-btn" title="Đóng">✕</button>
+        </div>
+        <div id="chat-history-list" class="chat-history-list"></div>
+      </div>
+      <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+      <!-- Login Modal -->
+      <div id="login-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-container">
+          <div class="modal-header">
+            <h2>
+              <span class="modal-icon" style="color: #22c55e; font-size: 24px; margin-right: 8px;">✨</span>
+              <span style="color: #22c55e;">Đăng nhập</span>
+            </h2>
+            <button id="switch-to-register" class="modal-switch-btn">Chưa có tài khoản? <span>Đăng ký</span></button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>
+                <span class="form-icon" style="color: #a855f7;">👤</span>
+                Tên đăng nhập
+              </label>
+              <input type="text" id="login-username" class="form-input" placeholder="Nhập tên đăng nhập của bạn" />
+            </div>
+            <div class="form-group">
+              <label>
+                <span class="form-icon" style="color: #f97316;">🔒</span>
+                Mật khẩu
+              </label>
+              <input type="password" id="login-password" class="form-input" placeholder="Nhập mật khẩu" />
+            </div>
+            <button id="login-submit" class="primary modal-submit-btn">Đăng nhập</button>
+            <div id="login-error" class="err" style="margin-top: 12px; display: none; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3);"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Register Modal -->
+      <div id="register-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-container" style="max-height: 90vh; overflow-y: auto;">
+          <div class="modal-header">
+            <h2>
+              <span class="modal-icon" style="color: #22c55e; font-size: 24px; margin-right: 8px;">✨</span>
+              <span style="color: #22c55e;">Đăng ký tài khoản</span>
+            </h2>
+            <button id="switch-to-login" class="modal-switch-btn">Đã có tài khoản? <span>Đăng nhập</span></button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>
+                <span class="form-icon" style="color: #a855f7;">👤</span>
+                Tên đăng nhập <span class="required">*</span>
+              </label>
+              <input type="text" id="register-username" class="form-input" placeholder="Chỉ chữ cái, số và dấu gạch dưới" />
+            </div>
+            <div class="form-group">
+              <label>
+                <span class="form-icon" style="color: #f97316;">🔒</span>
+                Mật khẩu <span class="required">*</span>
+              </label>
+              <input type="password" id="register-password" class="form-input" placeholder="Tối thiểu 4 ký tự" />
+            </div>
+            <div class="form-group">
+              <label>
+                <span class="form-icon" style="color: #f97316;">🔒</span>
+                Xác nhận mật khẩu <span class="required">*</span>
+              </label>
+              <input type="password" id="register-confirm-password" class="form-input" placeholder="Nhập lại mật khẩu" />
+            </div>
+            <div class="form-group">
+              <label>
+                <span class="form-icon" style="color: #3b82f6;">📧</span>
+                Email <span class="optional">(tùy chọn)</span>
+              </label>
+              <input type="email" id="register-email" class="form-input" placeholder="email@example.com" />
+            </div>
+            <div class="form-group">
+              <label>
+                <span class="form-icon" style="color: #eab308;">🏷️</span>
+                Họ và tên <span class="optional">(tùy chọn)</span>
+              </label>
+              <input type="text" id="register-fullname" class="form-input" placeholder="Họ và tên của bạn" />
+            </div>
+            <button id="register-submit" class="primary modal-submit-btn">Đăng ký</button>
+            <div id="register-error" class="err" style="margin-top: 12px; display: none; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3);"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="chat" class="chat"></div>
+
+      <div class="footer">
+        <div class="row">
+          <div class="input">
+            <textarea
+              id="prompt"
+              placeholder="Hãy nhập yêu cầu chuyến đi của bạn..."
+            ></textarea>
+            <!-- Image preview area - chỉ hiển thị ảnh, không có input riêng -->
+            <div id="image-preview-container" style="display: none; margin-top: 12px; position: relative; padding: 12px; background: rgba(34, 197, 94, 0.05); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 12px; animation: slideUp 0.3s ease;">
+              <div style="position: relative; display: inline-block;">
+                <img id="image-preview" style="max-width: 300px; max-height: 200px; border-radius: 10px; border: 2px solid rgba(34, 197, 94, 0.3); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);" />
+                <button id="remove-image" style="position: absolute; top: -8px; right: -8px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: 2px solid var(--bg); border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 16px; font-weight: bold; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4); transition: transform 0.2s;" 
+                        onmouseover="this.style.transform='scale(1.1)'" 
+                        onmouseout="this.style.transform='scale(1)'">×</button>
+          </div>
+            </div>
+          </div>
+          <label for="image-upload" class="upload-btn" title="Upload ảnh hoặc Paste (Ctrl+V)">
+            📷
+          </label>
+          <input type="file" id="image-upload" accept="image/*" style="display: none;" />
+          <button id="send" class="primary">Gửi</button>
+        </div>
+        <small style="display: block; margin-top: 8px; color: var(--muted); font-size: 12px; text-align: center;">
+          💡 <strong>Mẹo:</strong> Enter để gửi • Shift+Enter để xuống dòng • 📷 để upload ảnh • Ctrl+V để dán ảnh
+        </small>
+      </div>
+    </div>
+
+    <script>
+      // Tự động phát hiện API base URL
+      // Nếu chạy từ server (http://127.0.0.1:8000/ui), dùng relative URL
+      // Nếu chạy từ file:// hoặc Live Server, dùng absolute URL
+      const API_BASE = window.location.origin === "http://127.0.0.1:8000" || 
+                       window.location.origin === "http://localhost:8000"
+                       ? ""  // Relative URL khi chạy từ cùng origin
+                       : "http://127.0.0.1:8000";  // Absolute URL khi chạy từ origin khác
+
+      // Authentication API - sử dụng Python backend
+      const AUTH_API_BASE = API_BASE + "/api/";
+
+      const el = (q) => document.querySelector(q);
+      const chat = el("#chat");
+      const toVND = (x) => (x || 0).toLocaleString("vi-VN") + "₫";
+
+      // Hệ thống đăng nhập đơn giản
+      const USERS = {
+        "nguoidung1": "1234"
+      };
+
+      function getCurrentUser() {
+        const userStr = localStorage.getItem("currentUser");
+        if (!userStr) return null;
+        try {
+          return JSON.parse(userStr); // User object từ API
+        } catch {
+          return userStr; // Fallback: username string
+        }
+      }
+
+      function getCurrentUsername() {
+        const user = getCurrentUser();
+        if (!user) return null;
+        if (typeof user === 'object') {
+          return user.username || user.id || null;
+        }
+        return user; // username string
+      }
+
+      function setCurrentUser(user) {
+        if (user) {
+          // Lưu user object hoặc username
+          const userData = typeof user === 'object' ? JSON.stringify(user) : user;
+          localStorage.setItem("currentUser", userData);
+        } else {
+          localStorage.removeItem("currentUser");
+        }
+      }
+
+      function getSessionToken() {
+        return localStorage.getItem("sessionToken") || null;
+      }
+
+      function setSessionToken(token) {
+        if (token) {
+          localStorage.setItem("sessionToken", token);
+        } else {
+          localStorage.removeItem("sessionToken");
+        }
+      }
+
+      // Chat sessions management
+      let currentChatId = null;
+
+      function getChatHistoryKey(chatId = null) {
+        const user = getCurrentUser();
+        const id = chatId || currentChatId || "default";
+        if (user) {
+          const username = typeof user === 'object' ? (user.username || user.id) : user;
+          return `chat_history_${username}_${id}`;
+        }
+        return `chat_history_guest_${id}`;
+      }
+
+      function getChatSessionsKey() {
+        const user = getCurrentUser();
+        if (user) {
+          const username = typeof user === 'object' ? (user.username || user.id) : user;
+          return `chat_sessions_${username}`;
+        }
+        return "chat_sessions_guest";
+      }
+
+      function createNewChat() {
+        currentChatId = `chat_${Date.now()}`;
+        chat.innerHTML = "";
+        loadChatHistory();
+        updateChatSessions();
+        renderChatHistory();
+        // Ẩn sidebar nếu đang mở trên mobile
+        if (window.innerWidth < 768) {
+          el("#chat-sidebar").classList.remove("active");
+        }
+      }
+
+      function updateChatSessions() {
+        if (!currentChatId) return;
+        const sessions = getChatSessions();
+        const existingIndex = sessions.findIndex(s => s.id === currentChatId);
+        
+        // Lấy tin nhắn đầu tiên làm title
+        const firstUserMsg = chat.querySelector(".msg.user .bubble");
+        let title = "Chat mới";
+        if (firstUserMsg) {
+          // Lấy text từ HTML, loại bỏ tags
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = firstUserMsg.innerHTML;
+          const text = tempDiv.textContent || tempDiv.innerText || '';
+          title = text.trim().substring(0, 50) || "Chat mới";
+        }
+        
+        if (existingIndex >= 0) {
+          sessions[existingIndex].title = title;
+          sessions[existingIndex].updatedAt = Date.now();
+        } else {
+          sessions.unshift({
+            id: currentChatId,
+            title: title,
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+          });
+        }
+        
+        // Giới hạn 20 chat gần nhất
+        const limitedSessions = sessions.slice(0, 20);
+        localStorage.setItem(getChatSessionsKey(), JSON.stringify(limitedSessions));
+        renderChatHistory();
+      }
+
+      function getChatSessions() {
+        const sessionsStr = localStorage.getItem(getChatSessionsKey());
+        if (!sessionsStr) return [];
+        try {
+          return JSON.parse(sessionsStr);
+        } catch {
+          return [];
+        }
+      }
+
+      function deleteChatSession(chatId) {
+        const sessions = getChatSessions();
+        const filtered = sessions.filter(s => s.id !== chatId);
+        localStorage.setItem(getChatSessionsKey(), JSON.stringify(filtered));
+        
+        // Xóa chat history
+        localStorage.removeItem(getChatHistoryKey(chatId));
+        
+        // Nếu đang xóa chat hiện tại, tạo chat mới
+        if (chatId === currentChatId) {
+          createNewChat();
+        } else {
+          renderChatHistory();
+        }
+      }
+
+      function switchToChat(chatId) {
+        currentChatId = chatId;
+        loadChatHistory();
+        renderChatHistory();
+        // Ẩn sidebar nếu đang mở trên mobile
+        if (window.innerWidth < 768) {
+          el("#chat-sidebar").classList.remove("active");
+        }
+      }
+
+      function renderChatHistory() {
+        const sidebar = el("#chat-history-list");
+        if (!sidebar) return;
+        
+        const sessions = getChatSessions();
+        
+        if (sessions.length === 0) {
+          sidebar.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--muted);">
+            <p>Chưa có lịch sử chat</p>
+            <small>Tạo chat mới để bắt đầu</small>
+          </div>`;
+          return;
+        }
+        
+        sidebar.innerHTML = sessions.map(session => {
+          const isActive = session.id === currentChatId;
+          const date = new Date(session.updatedAt);
+          const dateStr = date.toLocaleDateString('vi-VN', { day: 'numeric', month: 'short' });
+          
+          return `
+            <div class="chat-history-item ${isActive ? 'active' : ''}" data-chat-id="${session.id}">
+              <div class="chat-history-content" onclick="switchToChat('${session.id}')">
+                <div class="chat-history-title">${escapeHtml(session.title)}</div>
+                <div class="chat-history-date">${dateStr}</div>
+              </div>
+              <button class="chat-history-delete" onclick="event.stopPropagation(); deleteChatSession('${session.id}')" title="Xóa chat">🗑️</button>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      function saveChatHistory() {
+        if (!currentChatId) return;
+        const messages = [];
+        chat.querySelectorAll(".msg").forEach(msg => {
+          const role = msg.classList.contains("user") ? "user" : "assistant";
+          const html = msg.querySelector(".bubble").innerHTML;
+          messages.push({ role, html });
+        });
+        localStorage.setItem(getChatHistoryKey(), JSON.stringify(messages));
+        // Cập nhật chat sessions
+        updateChatSessions();
+      }
+
+      function loadChatHistory(chatId = null) {
+        const targetId = chatId || currentChatId || "default";
+        if (!currentChatId && !chatId) {
+          currentChatId = targetId;
+        }
+        const history = localStorage.getItem(getChatHistoryKey(targetId));
+        if (history) {
+          try {
+            const messages = JSON.parse(history);
+            chat.innerHTML = "";
+            messages.forEach(msg => {
+              addMsg(msg.role, msg.html, false); // false = không save lại
+            });
+            chat.scrollTop = chat.scrollHeight;
+          } catch (e) {
+            console.error("Error loading chat history:", e);
+          }
+        } else {
+          chat.innerHTML = "";
+        }
+      }
+
+      function addMsg(role, html, save = true) {
+        // Tạo chat mới nếu chưa có khi có tin nhắn đầu tiên
+        if (!currentChatId && role === "user") {
+          createNewChat();
+        }
+        
+        const wrap = document.createElement("div");
+        wrap.className = "msg " + role;
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        bubble.innerHTML = html;
+        wrap.appendChild(bubble);
+        chat.appendChild(wrap);
+        chat.scrollTop = chat.scrollHeight;
+        if (save) {
+          saveChatHistory();
+        }
+        return bubble;
+      }
+
+      function itineraryToHTML(data) {
+        if (!data || !Array.isArray(data.itinerary)) {
+          return `<div class="err">Kết quả không hợp lệ.</div>`;
+        }
+        let head = `
+    <div class="kv">
+      <span>Tổng chi phí: <b>${toVND(data.total_cost_estimate)}</b></span>
+      <span>~ ${toVND(data.per_day_budget)}/ngày</span>
+      <span>Số ngày: ${data.days}</span>
+    </div>
+  `;
+        let daysHTML = data.itinerary
+          .map(
+            (d) => `
+    <details class="day" ${data.itinerary.length <= 3 ? "open" : ""}>
+      <summary>Ngày ${d.day} — Tổng: <b>${toVND(d.day_cost_estimate)}</b> ${
+              d.over_budget ? '<span class="err">(vượt ngân sách)</span>' : ""
+            }</summary>
+      <table>
+        <tr><th>Buổi</th><th>Địa điểm</th><th>Chi phí</th><th>Giờ mở</th><th>Đánh giá</th></tr>
+        ${periodRows("Sáng", d.morning_activities || (d.morning ? [d.morning] : []))}
+        ${periodRows("Trưa", d.lunch_activities || (d.lunch ? [d.lunch] : []))}
+        ${periodRows("Chiều", d.afternoon_activities || (d.afternoon ? [d.afternoon] : []))}
+        ${periodRows("Tối", d.evening_activities || (d.evening ? [d.evening] : []))}
+        ${row("Khách sạn", d.hotel)}
+      </table>
+    </details>
+  `
+          )
+          .join("");
+        return head + daysHTML;
+      }
+      function periodRows(label, items) {
+        if (!items || items.length === 0) {
+          return `<tr><td>${label}</td><td colspan="4"><span class="err">Không có gợi ý phù hợp</span></td></tr>`;
+        }
+        return items.map(item => row(label, item)).join('');
+      }
+      function row(label, p) {
+        if (!p)
+          return `<tr><td>${label}</td><td colspan="4"><span class="err">Không có gợi ý phù hợp</span></td></tr>`;
+        // Hỗ trợ cả 2 cấu trúc: cũ (p.name trực tiếp) và mới (p.location là object)
+        const loc = (p && typeof p.location === 'object' && p.location !== null) ? p.location : p;
+        const name = loc.name || p.name || 'Không rõ';
+        const city = loc.city || p.city || '';
+        const cat = loc.category || p.category || p.type || '';
+        const cost = (loc.avgCost !== undefined ? loc.avgCost : (loc.avg_cost !== undefined ? loc.avg_cost : (p.avgCost !== undefined ? p.avgCost : p.avg_cost))) || 0;
+        const openT = loc.openingTime || loc.open_time || p.openingTime || p.open_time || '-';
+        const closeT = loc.closingTime || loc.close_time || p.closingTime || p.close_time || '-';
+        const rating = loc.rating !== undefined ? loc.rating : (p.rating !== undefined ? p.rating : 0);
+        const slotTime = p.time || '';
+        return `<tr>
+      <td>${label}${slotTime ? ` <small style="color:var(--muted)">(${slotTime})</small>` : ''}</td>
+      <td><b>${name}</b><div class="meta">${city}${cat ? ' · ' + cat : ''}</div></td>
+      <td>${toVND(cost)}</td>
+      <td>${openT}–${closeT}</td>
+      <td>${(rating || 0).toFixed(2)}</td>
+    </tr>`;
+      }
+
+      async function checkServerConnection() {
+        try {
+          const r = await fetch(`${API_BASE}/`, { method: 'GET' });
+          return r.ok;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      // Hàm hỏi thông tin về địa danh (Q&A)
+      async function askQuestion(placeName) {
+        const question = `Thông tin về ${placeName}`;
+        addMsg("user", question);
+        
+        const thinking = addMsg("assistant", "⏳ Đang tìm thông tin...");
+        
+        try {
+          const serverOk = await checkServerConnection();
+          if (!serverOk) {
+            thinking.innerHTML = `<div class="err">
+              <strong>Không kết nối được với server!</strong><br/>
+              <small>Vui lòng kiểm tra server có đang chạy không.</small>
+            </div>`;
+            return;
+          }
+          
+          const p = new URLSearchParams({ q: question });
+          const r = await fetch(`${API_BASE}/ask?${p.toString()}`);
+          
+          if (!r.ok) {
+            thinking.innerHTML = `<div class="err">
+              <strong>Lỗi API ${r.status}</strong><br/>
+              <small>Không thể lấy thông tin về địa danh này.</small>
+            </div>`;
+            return;
+          }
+          
+          const data = await r.json();
+          
+          if (data.success && data.answer) {
+            thinking.innerHTML = `
+              <div style="padding: 16px; background: rgba(34, 197, 94, 0.05); border-radius: 12px; border-left: 4px solid var(--accent);">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                  <span style="font-size: 24px;">📍</span>
+                  <h3 style="margin: 0; color: var(--accent);">${data.place_info?.name || placeName}</h3>
+                </div>
+                <div style="line-height: 1.8; color: var(--text);">
+                  ${data.answer}
+                </div>
+                ${data.place_info ? `
+                  <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+                    <div style="display: grid; gap: 8px; font-size: 14px;">
+                      ${data.place_info.address ? `<div><strong>📍 Địa chỉ:</strong> ${data.place_info.address}</div>` : ''}
+                      ${data.place_info.category ? `<div><strong>🏷️ Loại:</strong> ${data.place_info.category}</div>` : ''}
+                      ${data.place_info.rating ? `<div><strong>⭐ Đánh giá:</strong> ${data.place_info.rating}/5</div>` : ''}
+                      ${data.place_info.avg_cost ? `<div><strong>💰 Chi phí:</strong> ${toVND(data.place_info.avg_cost)}</div>` : ''}
+                    </div>
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          } else {
+            thinking.innerHTML = `<div class="err">
+              <strong>Không tìm thấy thông tin</strong><br/>
+              <small>Không có thông tin về "${placeName}" trong database.</small>
+            </div>`;
+          }
+        } catch (e) {
+          console.error("Error asking question:", e);
+          thinking.innerHTML = `<div class="err">
+            <strong>Lỗi kết nối!</strong><br/>
+            <small>${e.message || "Unknown error"}</small>
+          </div>`;
+        }
+      }
+
+      // Lưu context lập lịch vào localStorage
+      function saveItineraryContext(context) {
+        const username = getCurrentUsername();
+        if (username) {
+          // Tăng variation mỗi lần tạo lịch trình mới
+          if (!context.variation) {
+            context.variation = 0;
+          } else {
+            context.variation = (context.variation || 0) + 1;
+          }
+          localStorage.setItem(`itinerary_context_${username}`, JSON.stringify(context));
+        }
+      }
+
+      // Lấy context lập lịch từ localStorage
+      function getItineraryContext() {
+        const username = getCurrentUsername();
+        if (username) {
+          const contextStr = localStorage.getItem(`itinerary_context_${username}`);
+          if (contextStr) {
+            try {
+              return JSON.parse(contextStr);
+            } catch (e) {
+              return null;
+            }
+          }
+        }
+        return null;
+      }
+
+      // Extract place IDs từ lịch trình
+      function extractPlaceIdsFromItinerary(itineraryData) {
+        const placeIds = [];
+        const foodIds = [];
+        if (itineraryData && itineraryData.itinerary) {
+          for (const day of itineraryData.itinerary) {
+            if (day.slots) {
+              for (const slot of day.slots) {
+                if (slot.place && slot.place.id) {
+                  placeIds.push(slot.place.id);
+                  // Track food places riêng
+                  if (slot.place.category === 'food') {
+                    foodIds.push(slot.place.id);
+                  }
+                }
+              }
+            }
+          }
+        }
+        return { all: placeIds, food: foodIds };
+      }
+
+      // Render matched predefined plans as clickable cards.
+      function renderMatchedPlans(intent, primary, secondaries, adapted, totalCostEstimate, costMin, costMax) {
+        const cityLabel = {
+          danang: 'Đà Nẵng',
+          hoian: 'Hội An',
+          hue: 'Huế',
+        }[intent.city] || (intent.city || '');
+
+        const planTypeBadge = (t) =>
+          t === 'adaptive'
+            ? '<span style="background:#a855f7;color:#fff;padding:2px 8px;border-radius:6px;font-size:11px;margin-left:6px">ADAPTIVE</span>'
+            : '<span style="background:#22c55e;color:#000;padding:2px 8px;border-radius:6px;font-size:11px;margin-left:6px">CORE</span>';
+
+        const fmtVND = (n) => (n || 0).toLocaleString('vi-VN') + '₫';
+
+        const days = adapted?.requested_days || intent.days || primary.default_days || 3;
+
+        // cardHtml:
+        //   - isPrimary = true  → clickable, gọi generateFromPlan
+        //   - isPrimary = false → chỉ hiển thị, không click
+        // LƯU Ý: budget_min/budget_max trong plan là TỔNG cho cả chuyến (per person),
+        // không nhân với days. Chỉ nhân với people_count nếu cần.
+        const cardHtml = (p, isPrimary) => {
+          const clickable = isPrimary
+            ? 'cursor:pointer;'
+            : 'cursor:default;opacity:0.85;';
+          const dataAttr = isPrimary
+            ? `data-plan-generate="${p.id}"`
+            : `data-plan-secondary="${p.id}"`;
+          // Cost hiển thị: cost_min/max từ API (đã × people), fallback về budget plan
+          const minTotal = costMin || (p.budget_min || 0);
+          const maxTotal = costMax || (p.budget_max || 0);
+          const costDisplay = minTotal > 0
+            ? `${fmtVND(minTotal)} - ${fmtVND(maxTotal)}`
+            : (totalCostEstimate > 0 ? fmtVND(totalCostEstimate) : 'Liên hệ');
+          // Per-person breakdown (nếu total > plan budget thì là cho cả nhóm)
+          const ppMin = p.budget_min || 0;
+          const ppMax = p.budget_max || 0;
+          return `
+            <div ${dataAttr}
+                 style="${clickable}background:rgba(255,255,255,0.04);
+                        border:1px solid var(--border);border-radius:12px;
+                        padding:14px;margin-bottom:10px;transition:all 0.2s;">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div style="font-weight:600;font-size:15px">
+                  ${p.name} ${planTypeBadge(p.plan_type)}
+                </div>
+                <div style="color:var(--accent);font-size:13px;font-weight:600">
+                  Score ${(p.score || 0).toFixed(1)}
+                </div>
+              </div>
+              <div style="color:var(--muted);font-size:13px;margin-top:4px">
+                ${p.description || ''}
+              </div>
+              <div style="display:flex;gap:14px;margin-top:8px;font-size:12px;color:var(--muted);flex-wrap:wrap">
+                <span>⏱️ ${p.default_days || 3} ngày</span>
+                <span title="Ngân sách tổng (đã × số người)">💰 ${costDisplay} <small>(ước tính cả chuyến)</small></span>
+                ${p.travel_style ? `<span>🎯 ${p.travel_style}</span>` : ''}
+              </div>
+              <div style="margin-top:8px;font-size:11px;color:var(--muted);font-style:italic">
+                ${(p.reasons || []).slice(0, 2).join(' · ')}
+              </div>
+              ${isPrimary
+                ? `<div style="margin-top:10px;text-align:center;color:var(--accent);font-size:13px">
+                     👉 Click để tạo lịch trình chi tiết
+                   </div>`
+                : `<div style="margin-top:10px;text-align:center;color:var(--muted);font-size:12px;font-style:italic">
+                     💡 Plan tham khảo (chỉ plan chính mới tạo được lịch trình)
+                   </div>`}
+            </div>`;
+        };
+
+        const adaptBadge = adapted?.adapted
+          ? `<span style="background:#f59e0b;color:#000;padding:3px 10px;border-radius:6px;font-size:12px;margin-left:8px">
+               ADAPTED ${adapted.adapt_type === 'expand' ? `↔ ${days} ngày` : '✂ nén'}
+             </span>`
+          : '';
+
+        return `
+          <div style="padding:16px;background:rgba(34,197,94,0.05);border-radius:12px;border-left:4px solid var(--accent)">
+            <div style="margin-bottom:12px">
+              <strong style="font-size:15px">📋 Plan phù hợp nhất cho ${cityLabel}</strong>
+              ${adaptBadge}
+            </div>
+            ${cardHtml(primary, true)}
+            ${secondaries && secondaries.length ? `
+              <div style="margin-top:12px;font-size:13px;color:var(--muted);margin-bottom:6px">
+                💡 Plan thay thế:
+              </div>
+              ${secondaries.map(p => cardHtml(p, false)).join('')}
+            ` : ''}
+            <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)">
+              Tôi đã phân tích: ${intent.days || '?'} ngày · ${intent.nights || '?'} đêm · ${fmtVND(intent.budget_total)}
+              ${intent.dominant_style ? ` · phong cách: ${intent.dominant_style}` : ''}
+            </div>
+          </div>`;
+      }
+
+      // Generate full itinerary from a chosen plan.
+      async function generateFromPlan(originalQuery, targetEl, planId) {
+        // Loading state giả lập AI đang "suy nghĩ" 3-7s
+        const thinkingMessages = [
+          '🧠 Đang phân tích sở thích của bạn...',
+          '🔍 Đang tìm địa điểm phù hợp với plan...',
+          '📍 Đang sắp xếp lịch trình tối ưu...',
+          '🍜 Đang chọn quán ăn ngon gần điểm tham quan...',
+          '🏨 Đang tìm khách sạn phù hợp ngân sách...',
+          '🗺️ Đang tính toán khoảng cách di chuyển...',
+          '✨ Đang hoàn thiện lịch trình chi tiết...'
+        ];
+
+        targetEl.innerHTML = `
+          <div style="text-align:center;padding:24px;background:rgba(34,197,94,0.05);
+                      border-radius:12px;border:1px solid rgba(34,197,94,0.2)">
+            <div style="font-size:32px;margin-bottom:12px">🤔</div>
+            <div id="thinking-text" style="color:var(--accent);font-size:15px;font-weight:600;margin-bottom:8px">
+              ${thinkingMessages[0]}
+            </div>
+            <div style="color:var(--muted);font-size:13px">
+              AI đang phân tích plan <strong>${planId || ''}</strong> và tạo lịch trình tối ưu cho bạn<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>
+            </div>
+            <div style="margin-top:16px;height:4px;background:rgba(34,197,94,0.1);border-radius:2px;overflow:hidden">
+              <div id="thinking-progress" style="height:100%;background:linear-gradient(90deg,#22c55e,#10b981);
+                                                width:0%;transition:width 0.3s ease;border-radius:2px"></div>
+            </div>
+          </div>`;
+
+        // Random delay 3-7s
+        const delay = 3000 + Math.random() * 4000;
+        const startTime = Date.now();
+        const thinkingText = targetEl.querySelector('#thinking-text');
+        const progressBar = targetEl.querySelector('#thinking-progress');
+
+        // Update message + progress mỗi 700ms
+        const updateInterval = setInterval(() => {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(95, (elapsed / delay) * 100);
+          if (progressBar) progressBar.style.width = progress + '%';
+
+          // Đổi message theo progress
+          const msgIndex = Math.floor((elapsed / delay) * (thinkingMessages.length - 1));
+          if (thinkingText && thinkingMessages[msgIndex]) {
+            thinkingText.textContent = thinkingMessages[msgIndex];
+          }
+        }, 700);
+
+        // Đợi hết delay
+        await new Promise(resolve => setTimeout(resolve, delay));
+        clearInterval(updateInterval);
+        if (progressBar) progressBar.style.width = '100%';
+
+        try {
+          const r = await fetch(`${API_BASE}/api/travel-plans/generate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: originalQuery })
+          });
+          if (!r.ok) throw new Error(`API ${r.status}`);
+          const data = await r.json();
+          // Use existing itineraryToHTML if itinerary present, else show JSON
+          if (data.itinerary && Array.isArray(data.itinerary)) {
+            targetEl.innerHTML = itineraryToHTML(data);
+          } else if (data.itinerary) {
+            targetEl.innerHTML = itineraryToHTML(data);
+          } else {
+            targetEl.innerHTML = '<pre style="white-space:pre-wrap;font-size:12px">' +
+              JSON.stringify(data, null, 2).slice(0, 3000) + '</pre>';
+          }
+          saveChatHistory();
+        } catch (e) {
+          targetEl.innerHTML = `<div class="err"><strong>Lỗi khi tạo lịch trình</strong><br/><small>${e.message}</small></div>`;
+          saveChatHistory();
+        }
+      }
+
+      // Detect câu hỏi "còn lịch nào khác không"
+      function isAlternativeItineraryQuery(prompt) {
+        const lowerPrompt = prompt.toLowerCase();
+        const keywords = [
+          'còn lịch nào khác',
+          'lịch khác',
+          'lịch trình khác',
+          'còn phương án nào khác',
+          'phương án khác',
+          'lịch thay thế',
+          'lịch khác không',
+          'còn cách nào khác',
+          'alternative',
+          'another itinerary',
+          'other plan'
+        ];
+        return keywords.some(keyword => lowerPrompt.includes(keyword));
+      }
+
+      // Detect câu hỏi "muốn đi chỗ mới" - cần thay đổi địa điểm/vị trí
+      function isNewLocationQuery(prompt) {
+        const lowerPrompt = prompt.toLowerCase();
+        const keywords = [
+          'không muốn đi chỗ cũ',
+          'muốn đi chỗ mới',
+          'địa điểm khác',
+          'vị trí khác',
+          'chỗ mới',
+          'đi nơi khác',
+          'địa danh khác',
+          'thay đổi địa điểm',
+          'đổi địa điểm',
+          'new location',
+          'different place',
+          'other location'
+        ];
+        return keywords.some(keyword => lowerPrompt.includes(keyword));
+      }
+
+      // Extract địa điểm chính từ query (ví dụ: "bà nà", "ngũ hành sơn")
+      function extractMainLocation(query) {
+        const lowerQuery = query.toLowerCase();
+        const locations = [
+          { keywords: ['bà nà', 'ba na', 'bana hills', 'sun world ba na'], name: 'bà nà' },
+          { keywords: ['ngũ hành sơn', 'marble mountains', 'ngu hanh son'], name: 'ngũ hành sơn' },
+          { keywords: ['sơn trà', 'son tra', 'bán đảo sơn trà'], name: 'sơn trà' },
+          { keywords: ['cầu rồng', 'dragon bridge'], name: 'cầu rồng' },
+          { keywords: ['cầu vàng', 'golden bridge'], name: 'cầu vàng' },
+          { keywords: ['mỹ khê', 'my khe', 'bãi biển mỹ khê'], name: 'mỹ khê' },
+          { keywords: ['non nước', 'bãi biển non nước'], name: 'non nước' },
+          { keywords: ['hội an', 'hoi an'], name: 'hội an' }
+        ];
+        
+        for (const loc of locations) {
+          for (const keyword of loc.keywords) {
+            if (lowerQuery.includes(keyword)) {
+              return loc.name;
+            }
+          }
+        }
+        return null;
+      }
+
+      // Tạo query mới không có địa điểm cũ, tập trung vào các địa điểm khác
+      function createNewLocationQuery(originalQuery, excludeLocation) {
+        if (!excludeLocation) {
+          // Nếu không có địa điểm cụ thể để loại bỏ, tạo query chung về Đà Nẵng
+          return 'điểm du lịch đà nẵng';
+        }
+        
+        // Loại bỏ địa điểm cũ khỏi query
+        let newQuery = originalQuery;
+        const excludeLower = excludeLocation.toLowerCase();
+        
+        // Tạo các pattern để loại bỏ địa điểm
+        const patterns = [
+          new RegExp(excludeLocation.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'),
+          new RegExp(excludeLocation.replace(/\s+/g, '\\s*').replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi')
+        ];
+        
+        for (const pattern of patterns) {
+          newQuery = newQuery.replace(pattern, '');
+        }
+        
+        // Làm sạch query (loại bỏ khoảng trắng thừa)
+        newQuery = newQuery.replace(/\s+/g, ' ').trim();
+        
+        // Nếu query quá ngắn hoặc chỉ còn các từ chung, thêm từ khóa về địa điểm khác
+        if (newQuery.length < 15 || newQuery.match(/^(tôi|muốn|đi|với|ngày|người|triệu|mức|giá)/i)) {
+          // Đề xuất các địa điểm thay thế phổ biến
+          const alternatives = {
+            'bà nà': 'ngũ hành sơn sơn trà',
+            'ngũ hành sơn': 'sơn trà cầu rồng',
+            'sơn trà': 'ngũ hành sơn bà nà',
+            'cầu rồng': 'cầu vàng bà nà',
+            'cầu vàng': 'cầu rồng ngũ hành sơn',
+            'mỹ khê': 'non nước sơn trà',
+            'non nước': 'mỹ khê sơn trà',
+            'hội an': 'đà nẵng'
+          };
+          
+          const alternative = alternatives[excludeLocation] || 'điểm du lịch đà nẵng';
+          newQuery = alternative + ' ' + newQuery;
+        }
+        
+        return newQuery.trim();
+      }
+
+      async function send() {
+        const prompt = el("#prompt").value.trim();
+        if (!prompt) return;
+        addMsg("user", prompt);
+        el("#prompt").value = "";
+
+        // Kiểm tra xem có phải câu hỏi về lịch trình thay thế không
+        const isAlternativeQuery = isAlternativeItineraryQuery(prompt);
+        const isNewLocation = isNewLocationQuery(prompt);
+        const savedContext = getItineraryContext();
+        
+        // Nếu là câu hỏi "muốn đi chỗ mới" và có context đã lưu
+        if (isNewLocation && savedContext) {
+          const thinking = addMsg("assistant", "⏳ Đang tạo lịch trình với địa điểm mới dựa trên điều kiện trước đó…");
+          
+          try {
+            // Lấy danh sách place IDs đã dùng từ lịch trình trước
+            const excludeIds = savedContext.used_place_ids || [];
+            
+            // Extract địa điểm chính từ query gốc và tạo query mới không có địa điểm đó
+            const originalLocation = extractMainLocation(savedContext.original_query || savedContext.query);
+            const newQuery = createNewLocationQuery(savedContext.original_query || savedContext.query, originalLocation);
+            
+            console.log(`🔄 Tạo lịch trình mới: loại bỏ địa điểm "${originalLocation}", query mới: "${newQuery}"`);
+            
+            // Tạo query params với context đã lưu nhưng query mới
+          const p = new URLSearchParams({
+              q: newQuery,
+              days: savedContext.days,
+              budget_total: savedContext.budget_total,
+              city: savedContext.city || '',
+              exclude_place_ids: excludeIds.join(',')
+            });
+            
+          const r = await fetch(`${API_BASE}/itinerary?${p.toString()}`);
+            
+            if (!r.ok) {
+              thinking.innerHTML = `<div class="err">
+                <strong>Lỗi khi tạo lịch trình với địa điểm mới</strong><br/>
+                <small>Vui lòng thử lại sau.</small>
+              </div>`;
+              return;
+            }
+            
+          const data = await r.json();
+            
+            // Cập nhật context với place IDs mới và query mới
+            if (data.itinerary) {
+              const newPlaceIds = extractPlaceIdsFromItinerary(data);
+              savedContext.used_place_ids = (savedContext.used_place_ids || []).concat(newPlaceIds);
+              savedContext.original_query = newQuery; // Cập nhật query mới
+              saveItineraryContext(savedContext);
+            }
+            
+            thinking.innerHTML = itineraryToHTML(data);
+          // Lưu chat history sau khi render itinerary
+          saveChatHistory();
+            return;
+          } catch (e) {
+            console.error("Error:", e);
+            thinking.innerHTML = `<div class="err">
+              <strong>Lỗi khi tạo lịch trình với địa điểm mới</strong><br/>
+              <small>${e.message || "Unknown error"}</small>
+            </div>`;
+            return;
+          }
+        }
+        
+        // Nếu là câu hỏi về lịch trình thay thế và có context đã lưu
+        if (isAlternativeQuery && savedContext) {
+          const thinking = addMsg("assistant", "⏳ Đang tạo lịch trình thay thế dựa trên điều kiện trước đó…");
+          
+          try {
+            // Lấy danh sách place IDs đã dùng từ lịch trình trước
+            const excludeIds = savedContext.used_place_ids || [];
+            const excludeFoodIds = savedContext.used_food_ids || [];
+            
+            console.log(`🔄 Alternative itinerary: exclude_place_ids=${excludeIds.length}, exclude_food_ids=${excludeFoodIds.length}`);
+            
+            // Tăng variation để tạo lịch trình khác nhau
+            const currentVariation = (savedContext.variation || 0) + 1;
+            savedContext.variation = currentVariation;
+            saveItineraryContext(savedContext);
+            
+            // Tạo query params với context đã lưu
+            const p = new URLSearchParams({
+              q: savedContext.original_query || savedContext.query,
+              days: savedContext.days,
+              budget_total: savedContext.budget_total,
+              city: savedContext.city || '',
+              exclude_place_ids: excludeIds.join(','),
+              exclude_food_ids: excludeFoodIds.join(',')  // Thêm exclude_food_ids
+            });
+            
+            const r = await fetch(`${API_BASE}/itinerary?${p.toString()}`);
+            
+          if (!r.ok) {
+              thinking.innerHTML = `<div class="err">
+                <strong>Lỗi khi tạo lịch trình thay thế</strong><br/>
+                <small>Vui lòng thử lại sau.</small>
+              </div>`;
+            return;
+          }
+            
+            const data = await r.json();
+            
+            // Cập nhật context với place IDs mới
+            if (data.itinerary) {
+              const extracted = extractPlaceIdsFromItinerary(data);
+              savedContext.used_place_ids = (savedContext.used_place_ids || []).concat(extracted.all);
+              savedContext.used_food_ids = (savedContext.used_food_ids || []).concat(extracted.food);
+              saveItineraryContext(savedContext);
+              console.log(`💾 Đã cập nhật context: used_place_ids=${savedContext.used_place_ids.length}, used_food_ids=${savedContext.used_food_ids.length}`);
+            }
+            
+          thinking.innerHTML = itineraryToHTML(data);
+          // Lưu chat history sau khi render itinerary
+          saveChatHistory();
+            return;
+        } catch (e) {
+            console.error("Error:", e);
+            thinking.innerHTML = `<div class="err">
+              <strong>Lỗi khi tạo lịch trình thay thế</strong><br/>
+              <small>${e.message || "Unknown error"}</small>
+            </div>`;
+            saveChatHistory(); // Lưu cả error message
+            return;
+          }
+        }
+
+        // Tự động detect nếu là câu hỏi về thông tin thì dùng /ask, còn lại dùng /itinerary
+        const isInfoQuery = /^(thông tin|info|giới thiệu|lịch sử|địa chỉ|ở đâu|về|về\s+)/i.test(prompt);
+        
+        const thinking = addMsg("assistant", isInfoQuery ? "⏳ Đang tìm thông tin..." : "⏳ Đang lập lịch trình…");
+
+        try {
+          // Kiểm tra kết nối server trước
+          const serverOk = await checkServerConnection();
+          if (!serverOk) {
+            thinking.innerHTML = `<div class="err">
+              <strong>Không kết nối được với server!</strong><br/>
+              <small>Vui lòng kiểm tra:</small><br/>
+              <small>1. Server có đang chạy không? (chạy: <code>python main.py</code>)</small><br/>
+              <small>2. Server có chạy ở ${API_BASE} không?</small><br/>
+              <small>3. Kiểm tra console (F12) để xem lỗi chi tiết</small>
+            </div>`;
+            return;
+          }
+
+          if (isInfoQuery) {
+            // Gọi /ask endpoint cho câu hỏi về thông tin
+            const p = new URLSearchParams({ q: prompt });
+            const r = await fetch(`${API_BASE}/ask?${p.toString()}`);
+            
+            if (!r.ok) {
+              thinking.innerHTML = `<div class="err">
+                <strong>Lỗi API ${r.status}</strong><br/>
+                <small>Không thể lấy thông tin.</small>
+              </div>`;
+              return;
+            }
+            
+            const data = await r.json();
+            
+            if (data.success && data.answer) {
+              thinking.innerHTML = `
+                <div style="padding: 16px; background: rgba(34, 197, 94, 0.05); border-radius: 12px; border-left: 4px solid var(--accent);">
+                  ${data.place_info ? `
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                      <span style="font-size: 24px;">📍</span>
+                      <h3 style="margin: 0; color: var(--accent);">${data.place_info.name}</h3>
+                    </div>
+                  ` : ''}
+                  <div style="line-height: 1.8; color: var(--text);">
+                    ${data.answer}
+                  </div>
+                  ${data.place_info ? `
+                    <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+                      <div style="display: grid; gap: 8px; font-size: 14px;">
+                        ${data.place_info.address ? `<div><strong>📍 Địa chỉ:</strong> ${data.place_info.address}</div>` : ''}
+                        ${data.place_info.category ? `<div><strong>🏷️ Loại:</strong> ${data.place_info.category}</div>` : ''}
+                        ${data.place_info.rating ? `<div><strong>⭐ Đánh giá:</strong> ${data.place_info.rating}/5</div>` : ''}
+                        ${data.place_info.avg_cost ? `<div><strong>💰 Chi phí:</strong> ${toVND(data.place_info.avg_cost)}</div>` : ''}
+                      </div>
+                    </div>
+                  ` : ''}
+                </div>
+              `;
+            } else {
+              thinking.innerHTML = `<div class="err">
+                <strong>Không tìm thấy thông tin</strong><br/>
+                <small>Không có thông tin về câu hỏi của bạn trong database.</small>
+              </div>`;
+            }
+            return;
+          }
+
+          // PRE-STEP: match predefined plans so users see plan suggestions
+          // before falling through to the legacy /itinerary endpoint.
+          // Thêm loading giả lập AI đang "suy nghĩ" 3-7s cho plan cứng
+          const planThinkingMessages = [
+            '🧠 Đang phân tích yêu cầu của bạn...',
+            '🔍 Đang tìm plan phù hợp nhất...',
+            '📊 Đang so sánh các plan du lịch...',
+            '✨ Đang chọn plan tối ưu cho bạn...'
+          ];
+          const planDelay = 3000 + Math.random() * 4000; // 3-7s
+          const planStartTime = Date.now();
+
+          // Hiển thị loading với progress bar
+          thinking.innerHTML = `
+            <div style="text-align:center;padding:24px;background:rgba(34,197,94,0.05);
+                        border-radius:12px;border:1px solid rgba(34,197,94,0.2)">
+              <div style="font-size:32px;margin-bottom:12px">🤔</div>
+              <div id="plan-thinking-text" style="color:var(--accent);font-size:15px;font-weight:600;margin-bottom:8px">
+                ${planThinkingMessages[0]}
+              </div>
+              <div style="color:var(--muted);font-size:13px">
+                AI đang phân tích và chọn plan phù hợp nhất<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>
+              </div>
+              <div style="margin-top:16px;height:4px;background:rgba(34,197,94,0.1);border-radius:2px;overflow:hidden">
+                <div id="plan-progress-bar" style="height:100%;background:linear-gradient(90deg,#22c55e,#10b981);
+                                                   width:0%;transition:width 0.3s ease;border-radius:2px"></div>
+              </div>
+            </div>`;
+
+          const planThinkingText = thinking.querySelector('#plan-thinking-text');
+          const planProgressBar = thinking.querySelector('#plan-progress-bar');
+          const planUpdateInterval = setInterval(() => {
+            const elapsed = Date.now() - planStartTime;
+            const progress = Math.min(95, (elapsed / planDelay) * 100);
+            if (planProgressBar) planProgressBar.style.width = progress + '%';
+            const msgIndex = Math.floor((elapsed / planDelay) * (planThinkingMessages.length - 1));
+            if (planThinkingText && planThinkingMessages[msgIndex]) {
+              planThinkingText.textContent = planThinkingMessages[msgIndex];
+            }
+          }, 700);
+
+          await new Promise(resolve => setTimeout(resolve, planDelay));
+          clearInterval(planUpdateInterval);
+          if (planProgressBar) planProgressBar.style.width = '100%';
+
+          try {
+            const planResp = await fetch(`${API_BASE}/api/travel-plans/match`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ query: prompt })
+            });
+            if (planResp.ok) {
+              const planData = await planResp.json();
+              if (planData && planData.primary_plan && planData.success) {
+                const intent = planData.intent || {};
+                const plan = planData.primary_plan;
+                const secondaries = (planData.secondary_plans || []).slice(0, 2);
+                const matchedHtml = renderMatchedPlans(
+                  intent,
+                  plan,
+                  secondaries,
+                  planData.adapted_plan,
+                  planData.total_cost_estimate,
+                  planData.cost_min_estimate,
+                  planData.cost_max_estimate
+                );
+                thinking.innerHTML = matchedHtml;
+                // Make the matched plan clickable for full itinerary
+                const planCards = thinking.querySelectorAll('[data-plan-generate]');
+                planCards.forEach(card => {
+                  card.addEventListener('click', async () => {
+                    const planId = card.getAttribute('data-plan-generate');
+                    card.style.opacity = '0.5';
+                    card.style.pointerEvents = 'none';
+                    await generateFromPlan(prompt, thinking, planId);
+                  }, { once: true });
+                });
+                return; // Stop here - user can click a plan to generate full itinerary
+              }
+            }
+          } catch (e) {
+            console.warn("Plan match pre-step failed, continuing to /itinerary:", e);
+          }
+
+          // mặc định: 1 ngày, 3 triệu, không city (sẽ tự động extract từ query)
+          const p = new URLSearchParams({
+            q: prompt,
+            // Không truyền days và budget_total để hệ thống tự động extract hoặc dùng default
+            // Default: 3 triệu, 1 ngày, đi 1 mình
+          });
+          const r = await fetch(`${API_BASE}/itinerary?${p.toString()}`);
+          
+          if (!r.ok) {
+            let errorMsg = `API lỗi ${r.status}`;
+            let errorDetails = "";
+            try {
+              const errorData = await r.json();
+              if (errorData?.detail) {
+                if (typeof errorData.detail === 'object') {
+                  errorMsg = errorData.detail.message || errorData.detail.error || errorMsg;
+                  errorDetails = `
+                    <br/><small>Loại lỗi: ${errorData.detail.error_type || 'Unknown'}</small>
+                    ${errorData.detail.hint ? `<br/><small>💡 Gợi ý: ${errorData.detail.hint}</small>` : ''}
+                  `;
+                } else {
+                  errorMsg += `: ${errorData.detail}`;
+                }
+              }
+            } catch {
+              errorMsg += `: ${r.statusText || "Unknown"}`;
+            }
+            thinking.innerHTML = `<div class="err">
+              <strong>${errorMsg}</strong>
+              ${errorDetails}
+              <br/><small>Kiểm tra console server để xem chi tiết lỗi</small>
+            </div>`;
+            return;
+          }
+          
+          const data = await r.json();
+          
+          // Lưu context lập lịch nếu là lịch trình mới (không phải alternative)
+          if (!isAlternativeQuery && data.itinerary) {
+            // Extract thông tin từ response hoặc từ query
+            const extracted = extractPlaceIdsFromItinerary(data);
+            const context = {
+              original_query: prompt,
+              query: prompt,
+              days: data.days || 1,
+              budget_total: data.total_cost_estimate || 3000000,
+              city: data.extracted_info?.city || 'Da Nang',
+              travel_companion: data.extracted_info?.travel_companion || 'solo',
+              used_place_ids: extracted.all,
+              used_food_ids: extracted.food,  // Lưu food IDs riêng
+              timestamp: Date.now()
+            };
+            saveItineraryContext(context);
+            console.log("💾 Đã lưu context lập lịch:", context);
+          }
+          
+          thinking.innerHTML = itineraryToHTML(data);
+          // Lưu chat history sau khi render itinerary
+          saveChatHistory();
+        } catch (e) {
+          console.error("Error:", e);
+          thinking.innerHTML = `<div class="err">
+            <strong>Lỗi kết nối API!</strong><br/>
+            <small>Chi tiết: ${e.message || "Unknown error"}</small><br/>
+            <small>Vui lòng kiểm tra:</small><br/>
+            <small>1. Server có đang chạy không? (chạy: <code>python main.py</code>)</small><br/>
+            <small>2. Mở Console (F12) để xem lỗi chi tiết</small>
+          </div>`;
+        }
+      }
+
+      let currentImageFile = null;
+
+      function showImagePreview(file) {
+        if (!file) return;
+        
+        currentImageFile = file;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          el("#image-preview").src = e.target.result;
+          el("#image-preview-container").style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function removeImagePreview() {
+        currentImageFile = null;
+        const previewContainer = el("#image-preview-container");
+        const preview = el("#image-preview");
+        const imageQuestion = el("#image-question");
+        const imageUpload = el("#image-upload");
+        
+        if (previewContainer) previewContainer.style.display = "none";
+        if (preview) preview.src = "";
+        if (imageQuestion) imageQuestion.value = "";
+        if (imageUpload) imageUpload.value = "";
+        
+        // Reset placeholder
+        const prompt = el("#prompt");
+        if (prompt) {
+          prompt.placeholder = "Hãy nhập yêu cầu chuyến đi của bạn...";
+        }
+      }
+
+      async function handleImageUpload(file, question = null) {
+        if (!file) return;
+        
+        // Lấy question từ input nếu không có
+        if (!question) {
+          question = el("#image-question").value.trim() || el("#prompt").value.trim() || null;
+        }
+        
+        // Hiển thị tin nhắn của user với ảnh và câu hỏi TRƯỚC KHI gửi request
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = async (e) => {
+            // Hiển thị tin nhắn user với ảnh và câu hỏi
+            let userMessage = `<div style="display: flex; flex-direction: column; gap: 12px;">
+              <img src="${e.target.result}" style="max-width: 400px; max-height: 300px; border-radius: 12px; border: 2px solid rgba(34, 197, 94, 0.4); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4); object-fit: contain;" />`;
+            
+            if (question && question.trim()) {
+              userMessage += `<div style="color: var(--text); font-weight: 500; padding: 12px 16px; background: rgba(34, 197, 94, 0.12); border-radius: 10px; border-left: 4px solid var(--accent); font-size: 15px; line-height: 1.6;">
+                💬 ${question}
+              </div>`;
+            } else {
+              // Nếu không có câu hỏi, vẫn hiển thị ảnh
+              userMessage += `<div style="color: var(--muted); font-size: 14px; font-style: italic; padding: 8px 12px;">
+                📷 Đã gửi ảnh để nhận diện địa danh
+              </div>`;
+            }
+            
+            userMessage += `</div>`;
+            
+            // Thêm tin nhắn user vào chat
+            addMsg("user", userMessage);
+            
+            // Scroll để thấy tin nhắn
+            chat.scrollTop = chat.scrollHeight;
+            
+            // Xóa preview ngay sau khi hiển thị
+            removeImagePreview();
+            
+            // Đợi một chút để UI render hoàn toàn
+            await new Promise(r => setTimeout(r, 200));
+            
+            // SAU ĐÓ mới hiển thị loading message với animation
+            const loadingDots = '<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>';
+            const thinking = addMsg("assistant", question && question.trim()
+              ? `<div style="display: flex; align-items: center; gap: 8px; padding: 12px;">
+                  <span style="font-size: 20px;">⏳</span>
+                  <span>Đang phân tích ảnh: <strong>"${question}"</strong>${loadingDots}</span>
+                </div>`
+              : `<div style="display: flex; align-items: center; gap: 8px; padding: 12px;">
+                  <span style="font-size: 20px;">⏳</span>
+                  <span>Đang nhận diện địa danh từ ảnh${loadingDots}</span>
+                </div>`);
+            
+            // Scroll lại để thấy loading
+            chat.scrollTop = chat.scrollHeight;
+            
+            try {
+              const formData = new FormData();
+              formData.append("file", file);
+              if (question && question.trim()) {
+                formData.append("question", question.trim());
+              }
+              
+              console.log("📸 Uploading image...", {
+                fileName: file.name,
+                fileSize: file.size,
+                question: question
+              });
+              
+              // Thêm timeout để tránh chờ quá lâu
+              const controller = new AbortController();
+              const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 giây timeout
+              
+              const r = await fetch(`${API_BASE}/ask_photo`, {
+                method: "POST",
+                body: formData,
+                signal: controller.signal
+              });
+              
+              clearTimeout(timeoutId);
+              
+              const data = await r.json();
+              
+              if (!r.ok) {
+                thinking.innerHTML = `<div class="err">
+                  <strong>❌ Lỗi khi xử lý ảnh</strong><br/>
+                  ${data?.detail || "Unknown error"}
+                </div>`;
+                chat.scrollTop = chat.scrollHeight;
+                resolve();
+                return;
+              }
+              
+              if (data.success && data.place_name) {
+                const placeName = data.place_name;
+                thinking.innerHTML = `
+                  <div style="padding: 16px; background: rgba(34, 197, 94, 0.05); border-radius: 12px; border-left: 4px solid var(--accent);">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                      <span style="color: #ec4899; font-size: 24px;">📍</span>
+                      <strong style="color: var(--text); font-size: 18px;">Địa danh nhận diện: ${placeName}</strong>
+                    </div>
+                    <div style="margin-bottom: 12px; padding: 8px 12px; background: rgba(0, 0, 0, 0.2); border-radius: 8px;">
+                      <small style="color: var(--muted);">Độ tin cậy: <strong style="color: var(--text);">${data.confidence || 'trung bình'}</strong></small>
+                      ${data.matched ? `<br/><small style="color: var(--accent);">✅ Đã tìm thấy trong database</small>` : ''}
+                    </div>
+                    ${data.answer ? `<div style="margin-bottom: 12px; padding: 12px; background: rgba(34, 197, 94, 0.1); border-radius: 8px; border-left: 3px solid var(--accent); line-height: 1.6;">${data.answer}</div>` : ''}
+                    <button onclick="askQuestion('${placeName}')" 
+                            style="background: linear-gradient(135deg, #22c55e 0%, #10b981 100%); border: none; color: #ffffff; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3); width: 100%; transition: all 0.3s; margin-top: 8px;"
+                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(34, 197, 94, 0.4)'"
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(34, 197, 94, 0.3)'">
+                      🔍 Tìm thông tin về ${placeName}
+                    </button>
+                  </div>
+                `;
+                chat.scrollTop = chat.scrollHeight;
+                resolve();
+              } else {
+                // Hiển thị lỗi chi tiết
+                let errorMsg = data.error || "Không thể nhận diện địa danh từ ảnh này.";
+                let errorDetails = "";
+                
+                if (data.error_type === "quota_exceeded") {
+                  errorMsg = "⚠️ OpenAI API đã hết quota!";
+                  errorDetails = `
+                    <br/><br/>
+                    <strong>Nguyên nhân:</strong><br/>
+                    <small>${data.error || "Tài khoản OpenAI đã hết tiền hoặc vượt giới hạn sử dụng."}</small>
+                    <br/><br/>
+                    <strong>💡 Cách khắc phục:</strong><br/>
+                    <small>1. Kiểm tra tài khoản tại: <a href="https://platform.openai.com/account/billing" target="_blank" style="color: var(--accent);">OpenAI Billing</a></small><br/>
+                    <small>2. Nạp thêm tiền vào tài khoản OpenAI</small><br/>
+                    <small>3. Hoặc đợi đến chu kỳ thanh toán mới</small><br/>
+                    <small>4. Kiểm tra giới hạn sử dụng trong <a href="https://platform.openai.com/account/limits" target="_blank" style="color: var(--accent);">Usage Limits</a></small>
+                    ${data.error_detail ? `<br/><br/><small>${data.error_detail}</small>` : ''}
+                  `;
+                } else if (data.error_type === "rate_limit") {
+                  errorMsg = "⚠️ Đã vượt quá giới hạn số lần gọi API!";
+                  errorDetails = `
+                    <br/><br/>
+                    <small>Vui lòng đợi một chút rồi thử lại. OpenAI có giới hạn số lần gọi API trong một khoảng thời gian.</small>
+                  `;
+                } else if (data.error) {
+                  errorDetails = `<br/><br/><small>Chi tiết: ${data.error}</small>`;
+                }
+                
+                thinking.innerHTML = `<div class="err">
+                  <strong>${errorMsg}</strong>
+                  ${errorDetails}
+                </div>`;
+                chat.scrollTop = chat.scrollHeight;
+                resolve();
+              }
+            } catch (e) {
+              console.error("Image upload error:", e);
+              if (e.name === 'AbortError') {
+                thinking.innerHTML = `<div class="err">
+                  <strong>⏱️ Hết thời gian chờ</strong><br/>
+                  Quá trình phân tích ảnh mất quá nhiều thời gian. Vui lòng thử lại với ảnh nhỏ hơn hoặc kiểm tra kết nối mạng.
+                </div>`;
+              } else {
+                thinking.innerHTML = `<div class="err">
+                  <strong>❌ Lỗi xử lý ảnh</strong><br/>
+                  ${e.message || "Có lỗi xảy ra khi xử lý ảnh. Vui lòng thử lại."}
+                </div>`;
+              }
+              chat.scrollTop = chat.scrollHeight;
+              resolve();
+            }
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      // Hệ thống đăng nhập với Python Backend
+      function showLogin() {
+    el("#login-modal").style.display = "flex";
+    el("#register-modal").style.display = "none";
+  }
+
+      // Hệ thống đăng nhập với PHP Backend
+      function showLogin() {
+        const loginModal = el("#login-modal");
+        const registerModal = el("#register-modal");
+        if (loginModal) loginModal.style.display = "flex";
+        if (registerModal) registerModal.style.display = "none";
+        // Ẩn sidebar toggle khi chưa đăng nhập
+        const sidebarToggle = el("#sidebar-toggle");
+        if (sidebarToggle) sidebarToggle.style.display = "none";
+      }
+
+      function hideLogin() {
+        el("#login-modal").style.display = "none";
+      }
+
+      function showRegister() {
+        el("#register-modal").style.display = "flex";
+        el("#login-modal").style.display = "none";
+      }
+
+      function hideRegister() {
+        el("#register-modal").style.display = "none";
+      }
+
+      async function login(username, password) {
+        try {
+          const response = await fetch(AUTH_API_BASE + 'login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, password })
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            setCurrentUser(data.data.user);
+            setSessionToken(data.data.session_token);
+            el("#username-display").textContent = data.data.user.username;
+            el("#user-info").style.display = "block";
+            // Hiển thị sidebar toggle khi đã đăng nhập
+            const sidebarToggle = el("#sidebar-toggle");
+            if (sidebarToggle) sidebarToggle.style.display = "flex";
+            hideLogin();
+            // Tạo chat mới khi đăng nhập
+            createNewChat();
+            renderChatHistory();
+            return true;
+          } else {
+            el("#login-error").textContent = data.message || "Đăng nhập thất bại";
+            el("#login-error").style.display = "block";
+            return false;
+          }
+        } catch (error) {
+          console.error('Login error:', error);
+          el("#login-error").textContent = "Có lỗi xảy ra khi đăng nhập";
+          el("#login-error").style.display = "block";
+          return false;
+        }
+      }
+
+      async function register(username, password, confirmPassword, email, fullName) {
+        try {
+          const response = await fetch(AUTH_API_BASE + 'register', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              username,
+              password,
+              confirm_password: confirmPassword,
+              email: email || '',
+              full_name: fullName || ''
+            })
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Tự động đăng nhập sau khi đăng ký
+            setCurrentUser(data.data.user);
+            setSessionToken(data.data.session_token);
+            el("#username-display").textContent = data.data.user.username;
+            el("#user-info").style.display = "block";
+            // Hiển thị sidebar toggle khi đã đăng nhập
+            const sidebarToggle = el("#sidebar-toggle");
+            if (sidebarToggle) sidebarToggle.style.display = "flex";
+            hideRegister();
+            // Tạo chat mới khi đăng ký
+            createNewChat();
+            renderChatHistory();
+            return true;
+          } else {
+            el("#register-error").textContent = data.message || "Đăng ký thất bại";
+            el("#register-error").style.display = "block";
+            return false;
+          }
+        } catch (error) {
+          console.error('Register error:', error);
+          el("#register-error").textContent = "Có lỗi xảy ra khi đăng ký";
+          el("#register-error").style.display = "block";
+          return false;
+        }
+      }
+
+      async function logout() {
+        const sessionToken = getSessionToken();
+        
+        if (sessionToken) {
+          try {
+            await fetch(AUTH_API_BASE + 'logout', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ session_token: sessionToken })
+            });
+          } catch (error) {
+            console.error('Logout error:', error);
+          }
+        }
+
+        setCurrentUser(null);
+        setSessionToken(null);
+        el("#user-info").style.display = "none";
+        // Ẩn sidebar toggle khi đăng xuất
+        const sidebarToggle = el("#sidebar-toggle");
+        if (sidebarToggle) sidebarToggle.style.display = "none";
+        chat.innerHTML = "";
+        currentChatId = null;
+        renderChatHistory();
+        showLogin();
+      }
+
+      async function checkSession() {
+        const sessionToken = getSessionToken();
+        if (!sessionToken) {
+          return false;
+        }
+
+        try {
+          const response = await fetch(AUTH_API_BASE + 'check_session?session_token=' + encodeURIComponent(sessionToken));
+          const data = await response.json();
+
+          if (data.success) {
+            setCurrentUser(data.data.user);
+            setSessionToken(data.data.session_token);
+            el("#username-display").textContent = data.data.user.username;
+            el("#user-info").style.display = "block";
+            // Hiển thị sidebar toggle khi đã đăng nhập
+            const sidebarToggle = el("#sidebar-toggle");
+            if (sidebarToggle) sidebarToggle.style.display = "flex";
+            // Load chat history khi session hợp lệ
+            if (!currentChatId) {
+              createNewChat();
+            } else {
+              loadChatHistory();
+            }
+            renderChatHistory();
+            return true;
+          } else {
+            setCurrentUser(null);
+            setSessionToken(null);
+            return false;
+          }
+        } catch (error) {
+          console.error('Check session error:', error);
+          return false;
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        // Kiểm tra session khi trang được tải
+        const hasValidSession = await checkSession();
+        
+        if (hasValidSession) {
+          const currentUser = getCurrentUser();
+          if (currentUser) {
+            const username = typeof currentUser === 'object' ? currentUser.username : currentUser;
+            el("#username-display").textContent = username;
+            el("#user-info").style.display = "block";
+            // Hiển thị sidebar toggle khi đã đăng nhập
+            const sidebarToggle = el("#sidebar-toggle");
+            if (sidebarToggle) sidebarToggle.style.display = "flex";
+            // Tạo chat mới nếu chưa có
+            if (!currentChatId) {
+              createNewChat();
+            } else {
+              loadChatHistory();
+            }
+            renderChatHistory();
+          }
+        } else {
+          // Hiển thị modal đăng nhập ngay lập tức
+          showLogin();
+        }
+
+        // Sidebar handlers - chỉ thêm nếu element tồn tại
+        const sidebarToggle = el("#sidebar-toggle");
+        const chatSidebar = el("#chat-sidebar");
+        const sidebarOverlay = el("#sidebar-overlay");
+        const sidebarClose = el("#sidebar-close");
+        const newChatBtn = el("#new-chat-btn");
+        
+        if (sidebarToggle && chatSidebar && sidebarOverlay) {
+          sidebarToggle.addEventListener("click", () => {
+            chatSidebar.classList.toggle("active");
+            sidebarOverlay.classList.toggle("active");
+          });
+        }
+        
+        if (sidebarClose && chatSidebar && sidebarOverlay) {
+          sidebarClose.addEventListener("click", () => {
+            chatSidebar.classList.remove("active");
+            sidebarOverlay.classList.remove("active");
+          });
+        }
+        
+        if (sidebarOverlay && chatSidebar) {
+          sidebarOverlay.addEventListener("click", () => {
+            chatSidebar.classList.remove("active");
+            sidebarOverlay.classList.remove("active");
+          });
+        }
+        
+        if (newChatBtn) {
+          newChatBtn.addEventListener("click", () => {
+            createNewChat();
+          });
+        }
+
+        // Login handlers
+        el("#login-submit").addEventListener("click", async () => {
+          const username = el("#login-username").value.trim();
+          const password = el("#login-password").value;
+          
+          if (!username || !password) {
+            el("#login-error").textContent = "Vui lòng nhập đầy đủ thông tin";
+            el("#login-error").style.display = "block";
+            return;
+          }
+
+          el("#login-error").style.display = "none";
+          await login(username, password);
+        });
+
+        el("#login-password").addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            el("#login-submit").click();
+          }
+        });
+
+        el("#login-username").addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            el("#login-password").focus();
+          }
+        });
+
+        // Register handlers
+        el("#register-submit").addEventListener("click", async () => {
+          const username = el("#register-username").value.trim();
+          const password = el("#register-password").value;
+          const confirmPassword = el("#register-confirm-password").value;
+          const email = el("#register-email").value.trim();
+          const fullName = el("#register-fullname").value.trim();
+
+          if (!username || !password || !confirmPassword) {
+            el("#register-error").textContent = "Vui lòng điền đầy đủ các trường bắt buộc";
+            el("#register-error").style.display = "block";
+            return;
+          }
+
+          el("#register-error").style.display = "none";
+          await register(username, password, confirmPassword, email, fullName);
+        });
+
+        el("#register-confirm-password").addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            el("#register-submit").click();
+          }
+        });
+
+        // Switch between login and register
+        el("#switch-to-register")?.addEventListener("click", () => {
+          showRegister();
+        });
+
+        el("#switch-to-login")?.addEventListener("click", () => {
+          showLogin();
+        });
+
+        // Logout handler
+        el("#logout-btn").addEventListener("click", (e) => {
+          e.preventDefault();
+          logout();
+        });
+
+        // Sidebar handlers
+        el("#sidebar-toggle")?.addEventListener("click", () => {
+          el("#chat-sidebar").classList.toggle("active");
+          el("#sidebar-overlay").classList.toggle("active");
+        });
+
+        el("#sidebar-close")?.addEventListener("click", () => {
+          el("#chat-sidebar").classList.remove("active");
+          el("#sidebar-overlay").classList.remove("active");
+        });
+
+        el("#sidebar-overlay")?.addEventListener("click", () => {
+          el("#chat-sidebar").classList.remove("active");
+          el("#sidebar-overlay").classList.remove("active");
+        });
+
+        el("#new-chat-btn")?.addEventListener("click", () => {
+          createNewChat();
+        });
+
+        // Kiểm tra kết nối server khi trang được tải (chỉ thêm message nếu đã đăng nhập và chat đang trống)
+        const currentUser = getCurrentUser();
+        if (currentUser && chat.children.length === 0) {
+          const serverOk = await checkServerConnection();
+          if (!serverOk) {
+            addMsg("assistant", `<div class="err">
+              <strong>⚠️ Cảnh báo: Không kết nối được với server!</strong><br/>
+              <small>Vui lòng đảm bảo server đang chạy:</small><br/>
+              <small>1. Mở terminal và chạy: <code>python main.py</code></small><br/>
+              <small>2. Đợi server khởi động xong (thấy thông báo "Application startup complete")</small><br/>
+              <small>3. Kiểm tra server tại: <a href="${API_BASE}" target="_blank">${API_BASE}</a></small>
+            </div>`, false);
+          } else {
+            addMsg("assistant", `<div style="color: var(--accent);">
+              ✅ Đã kết nối với server thành công!<br/>
+              <small>Bạn có thể bắt đầu nhập yêu cầu du lịch của mình.</small>
+            </div>`, false);
+          }
+        }
+
+        // Store original send function
+        const originalSend = send;
+        
+        // Override send function to handle images
+        send = function() {
+          if (currentImageFile) {
+            const question = el("#prompt").value.trim() || null;
+            handleImageUpload(currentImageFile, question);
+          } else {
+            originalSend();
+          }
+        };
+        
+        el("#send").addEventListener("click", send);
+        el("#prompt").addEventListener("keydown", (ev) => {
+          if (ev.key === "Enter" && !ev.shiftKey) {
+            ev.preventDefault();
+            // Nếu có ảnh trong preview, gửi ảnh với câu hỏi từ textarea
+            if (currentImageFile) {
+              const question = el("#prompt").value.trim() || null;
+              handleImageUpload(currentImageFile, question);
+            } else {
+            send();
+            }
+          }
+        });
+        
+        // Image upload handler - chỉ show preview, không gửi ngay
+        el("#image-upload").addEventListener("change", (ev) => {
+          const file = ev.target.files[0];
+          if (file) {
+            showImagePreview(file);
+            ev.target.value = ""; // Reset input để có thể chọn lại file
+            // Focus vào textarea để nhập câu hỏi
+            setTimeout(() => {
+              const promptEl = el("#prompt");
+              if (promptEl) promptEl.focus();
+            }, 100);
+          }
+        });
+
+        // Remove image button
+        el("#remove-image").addEventListener("click", () => {
+          removeImagePreview();
+        });
+
+        // Paste from clipboard
+        document.addEventListener("paste", async (ev) => {
+          const items = ev.clipboardData?.items;
+          if (!items) return;
+
+          for (let i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf("image") !== -1) {
+              ev.preventDefault();
+              const file = items[i].getAsFile();
+              if (file) {
+                showImagePreview(file);
+                // Focus vào textarea để nhập câu hỏi
+                setTimeout(() => {
+                  const promptEl = el("#prompt");
+                  if (promptEl) promptEl.focus();
+                }, 100);
+              }
+              break;
+            }
+          }
+        });
+
+        // Không cần event listener riêng cho image-question vì đã dùng chung textarea
+      });
+    </script>
+  </body>
+</html>
