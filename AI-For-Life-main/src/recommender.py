@@ -1571,12 +1571,14 @@ class Recommender:
                 if hotel_picked:
                     print(f"   KS raw: {hotel_picked.get('avg_cost')}")
 
-            # Tính tiền khách sạn theo số phòng và số ngày
+            # Tính tiền khách sạn theo số phòng và số đêm
+            # Convention: trip N ngày → (N-1) đêm (check-out sáng ngày cuối)
             hotel_cost_per_room_per_day = hotel_cost if hotel_picked else 0
-            # Tính chi phí hotel cho 1 ngày (theo số phòng)
+            # Tính chi phí hotel cho 1 đêm (theo số phòng)
             hotel_cost_per_day = hotel_cost_per_room_per_day * num_rooms
-            # Tổng tiền khách sạn cho tất cả ngày
-            hotel_total_all_days = hotel_cost_per_room_per_day * num_rooms * days
+            # Tổng tiền khách sạn cho toàn bộ chuyến (N-1) đêm
+            num_nights = max(0, days - 1)
+            hotel_total_all_days = hotel_cost_per_room_per_day * num_rooms * num_nights
             
             # day_cost chỉ tính chi phí 1 ngày (bao gồm hotel cho 1 ngày)
             # Nhưng cần điều chỉnh: thay vì chỉ tính hotel_cost (1 phòng), tính hotel_cost_per_day (số phòng)
@@ -1606,26 +1608,26 @@ class Recommender:
                 } if hotel_picked else None
             })
 
-        # Tính tổng chi phí: tổng các ngày (đã tính hotel cho mỗi ngày) - hotel trùng lặp + hotel tổng
-        # Vì mỗi ngày đã tính hotel_cost_per_day, nên tổng = sum(day_cost) - hotel_cost_per_day * (days-1) + hotel_total_all_days
-        # Hoặc đơn giản hơn: sum(day_cost) - (hotel_cost_per_day * days) + hotel_total_all_days
-        # Nhưng thực ra nếu mỗi ngày đã tính đúng hotel_cost_per_day thì tổng đã đúng rồi
-        
-        # Tính tổng tiền khách sạn cho toàn bộ chuyến đi
-        hotel_total_all_days = 0
+        # === Tính tổng chi phí ===
+        # Convention: trip N ngày → (N-1) đêm khách sạn (check-out sáng ngày cuối)
+        #
+        # day_cost_estimate đã bao gồm hotel_cost_per_day × 1 cho MỖI ngày
+        #   → tổng day_cost = activities_sum + hotel_per_day × days
+        #
+        # Để ra tổng thực tế:
+        #   total = activities_sum + hotel_total_for_trip
+        #         = total_day_costs - hotel_per_day × days + hotel_per_day × (days-1)
+        #         = total_day_costs - hotel_per_day
+        #         = total_day_costs - (hotel_per_day × 1)
         hotel_cost_per_day = 0
         if plan and plan[0].get("hotel_info"):
-            hotel_info = plan[0]["hotel_info"]
-            cost_per_room = hotel_info.get("cost_per_room_per_day", 0)
-            num_rooms = hotel_info.get("num_rooms", 1)
-            hotel_cost_per_day = cost_per_room * num_rooms
-            hotel_total_all_days = cost_per_room * num_rooms * days
-        
-        # Tính tổng chi phí: tổng các ngày (mỗi ngày đã tính hotel cho 1 ngày)
-        # Nhưng hotel thực tế chỉ trả 1 lần cho tất cả ngày, nên cần điều chỉnh
+            _hinfo = plan[0]["hotel_info"]
+            hotel_cost_per_day = int(_hinfo.get("cost_per_room_per_day", 0)) * int(_hinfo.get("num_rooms", 1))
+        hotel_total_for_trip = hotel_cost_per_day * max(0, days - 1)  # (N-1) đêm
+
         total_day_costs = sum(x["day_cost_estimate"] for x in plan)
-        # Trừ đi hotel đã tính trong các ngày (vì tính nhiều lần) và cộng lại tổng hotel
-        total = total_day_costs - (hotel_cost_per_day * (days - 1)) if days > 1 else total_day_costs
+        # Trừ bớt 1 đêm hotel đã tính thừa trong day_cost
+        total = total_day_costs - hotel_cost_per_day
         
         # Tính lại over_budget dựa trên total budget, không phải per_day_budget
         # Nếu tổng chi phí vượt quá total budget thì đánh dấu

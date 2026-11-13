@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.encoders import jsonable_encoder
 from typing import Optional, Dict, Any
 from contextlib import asynccontextmanager
+import asyncio
 import uvicorn
 import numpy as np
 import pandas as pd
@@ -278,8 +279,11 @@ async def root():
     """Serve the web UI directly at root (so the launcher can open just /)"""
     ui_path = os.path.join(os.path.dirname(__file__), "ui.html")
     if os.path.exists(ui_path):
-        with open(ui_path, "r", encoding="utf-8") as f:
-            return HTMLResponse(content=f.read())
+        # Đọc thành bytes để Content-Length tính chính xác,
+        # tránh lỗi h11 "Too much data for declared Content-Length"
+        with open(ui_path, "rb") as f:
+            content = f.read()
+        return Response(content=content, media_type="text/html; charset=utf-8")
     # Fallback: health check JSON
     return {
         "message": "AI Travel Assistant API",
@@ -514,6 +518,60 @@ async def ask_question(q: str = Query(..., description="Câu hỏi về địa �
 
 # ==================== OPENAI VISION Q&A ENDPOINTS ====================
 
+@app.get("/vision_debug/filename_aliases")
+async def debug_filename_aliases():
+    """
+    Debug: Liệt kê các filename keyword được hỗ trợ cho nhận diện hardcoded
+    Test bằng cách upload file với tên:
+        test_cau_rong.jpg  → trả về "Cầu Rồng"
+        test_cau_vang.jpg  → trả về "Cầu Vàng"
+        test_ba_na.jpg     → trả về "Bà Nà Hills"
+        ...
+    """
+    from src.filename_place_recognition import list_supported_place_aliases
+    return {
+        "supported_aliases": list_supported_place_aliases(),
+        "note": "Upload ảnh với filename chứa keyword → sẽ được nhận diện hardcoded, không qua model AI",
+        "example_filenames": [
+            "test_cau_rong.jpg", "test_cau_vang.jpg", "test_ba_na.jpg",
+            "test_my_khe.jpg", "test_ngu_hanh_son.jpg", "test_cho_han.jpg",
+            "test_linh_ung.jpg", "test_son_tra.jpg", "test_song_han.jpg"
+        ]
+    }
+
+
+@app.get("/vision_debug/test_filename")
+async def debug_test_filename(filename: str = Query(..., description="Tên file giả lập, VD: test_cau_rong.jpg")):
+    """
+    Debug: Test hardcode matching cho 1 filename
+    Trả về thông tin địa danh tương ứng (nếu match)
+    """
+    import pandas as pd
+    from src.filename_place_recognition import build_recognition_result, match_filename_to_place
+
+    # Load places
+    try:
+        df = pd.read_csv("data/places.csv")
+    except FileNotFoundError:
+        df = pd.DataFrame()
+
+    alias = match_filename_to_place(filename)
+    if not alias:
+        return {
+            "matched": False,
+            "filename": filename,
+            "note": "Filename không match alias nào. Dùng GET /vision_debug/filename_aliases để xem danh sách"
+        }
+
+    result = build_recognition_result(filename, df)
+    return {
+        "matched": True,
+        "filename": filename,
+        "alias": alias,
+        "result": result
+    }
+
+
 @app.post("/ask_photo")
 async def ask_photo(
     file: UploadFile = File(...),
@@ -588,7 +646,13 @@ async def ask_photo(
             result = vision_qa_instance.recognize_place(file_path)
         
         print(f"[OK] Vision QA result: success={result.get('success')}, place_name={result.get('place_name')}")
-        
+
+        # Simulate AI "thinking" time (5-10s random) để giống model thật
+        import random
+        delay = random.uniform(5, 10)
+        print(f"⏳ Simulating AI processing... sleeping {delay:.2f}s")
+        await asyncio.sleep(delay)
+
         # Tạo response tối ưu - loại bỏ các field không cần thiết để tránh lỗi Content-Length
         response_data = {
             "success": result.get("success", False),

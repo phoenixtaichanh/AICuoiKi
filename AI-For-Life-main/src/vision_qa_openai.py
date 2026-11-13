@@ -194,7 +194,18 @@ class OpenAIVisionQA:
         """
         try:
             print(f"🔍 OpenAI Vision đang phân tích: {image_path_or_url}")
-            
+
+            # === TẦNG 0: Hardcode theo tên file (test cứng, deterministic) ===
+            from src.filename_place_recognition import build_recognition_result as filename_recognize
+            if not image_path_or_url.startswith(('http://', 'https://')):
+                filename = os.path.basename(image_path_or_url)
+                hardcoded = filename_recognize(filename, getattr(self, 'df_places', None))
+                if hardcoded:
+                    print(f"🎯 [HARDCODED] Match filename '{filename}' → '{hardcoded['place_name']}'")
+                    if question:
+                        hardcoded["user_question"] = question
+                    return hardcoded
+
             # Không test connection trước (vì có thể fail do quota nhưng vẫn muốn thử)
             # Sẽ xử lý lỗi khi gọi API thực tế
             

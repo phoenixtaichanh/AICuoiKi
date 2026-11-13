@@ -1094,10 +1094,12 @@
         if (!data || !Array.isArray(data.itinerary)) {
           return `<div class="err">Kết quả không hợp lệ.</div>`;
         }
+        let avgPerDay = data.days > 0 ? Math.round(data.total_cost_estimate / data.days) : 0;
+        let pctUsed = data.total_budget > 0 ? Math.round((data.total_cost_estimate / data.total_budget) * 100) : 0;
         let head = `
     <div class="kv">
-      <span>Tổng chi phí: <b>${toVND(data.total_cost_estimate)}</b></span>
-      <span>~ ${toVND(data.per_day_budget)}/ngày</span>
+      <span>Tổng chi phí: <b>${toVND(data.total_cost_estimate)}</b> / Ngân sách: <b>${toVND(data.total_budget)}</b> (${pctUsed}%)</span>
+      <span>~ ${toVND(avgPerDay)}/ngày (budget: ${toVND(data.per_day_budget)}/ngày)</span>
       <span>Số ngày: ${data.days}</span>
     </div>
   `;
